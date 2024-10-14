@@ -23,6 +23,11 @@ def create_app():
             c = Customer(name='John', phone='123', city='abc', address='asgkjdchgkjh',)
             u = User(username='john', email='abc@gmail.com', role='customer', date_joined=datetime(2020, 1, 1), password = 'a', customer_det=c)
             db.session.add(u)
+
+        admin = User.query.filter_by(role='admin').first()
+        if not admin:
+            u = User(username='admin', email='admin@gmail.com', role='admin', date_joined=datetime.now(), password = '123')
+            db.session.add(u)
             
         sp_role = User.query.filter_by(role='service_professional').first()
         if not sp_role:

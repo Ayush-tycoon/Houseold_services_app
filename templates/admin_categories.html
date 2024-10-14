@@ -1,0 +1,43 @@
+{% if session['role']=='admin' %}
+
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Manage Categories</h1>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Category</th>
+            <th scope="col">Base Price</th>
+            <th scope="col">Time required</th>
+            <th scope="col">Description</th>
+            <th scope="col">Actions</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+            {% for category in service_categories %}
+          <tr>
+            <td scope="row">{{category.name}}</td>
+            <td scope="row">{{category.base_price}}</td> 
+            <td scope="row">{{category.time_required}}</td>
+            <td scope="row">{{category.description}}</td>     
+            <td scope="row">
+                <a href="#" class="btn btn-primary">Edit</a>
+                <a href="#" class="btn btn-danger">Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a href="{{url_for('addcategory')}}" class="btn btn-primary">Add Category</a>
+
+
+{% endblock %}
+    
+{% else %}
+    <h1>Access Denied</h1>
+    <p>You do not have permission to access this page</p>
+    <a href="{{ url_for('home') }}">Go back to home</a>
+{% endif %}
+

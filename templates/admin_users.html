@@ -1,0 +1,108 @@
+{% if session['role']=='admin' %}
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="text-center">Welcome to the Admin Dashboard</h1>
+            </div>
+        </div>
+    </div>
+    
+    <table class='table'>
+        <p class="h3">Customers</p>
+        <tr>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">City</th>
+            <th scope="col">Date Joined</th>
+            <th scope="col">Actions</th>
+        </tr>
+        {% for user in Customers %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.customer_det.phone }}</td>  <!-- Accessing phone through customer_det -->
+                <td>{{ user.customer_det.city }}</td>   <!-- Accessing city through customer_det -->
+                <td>{{ user.date_joined }}</td>
+                <td>
+                    <a href="#" role="button" class="btn btn-outline-primary">Edit</a>
+                    <a href="#" role="button" class="btn btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <table class="table">     
+        <h3 class="h3">Service Professionals</h3>
+        <tr>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">City</th>
+            <th scope="col">Date Joined</th>
+            <th scope="col">Service Category</th>
+            <th scope="col">Rate per hour</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+        </tr>
+        {% for user in ServiceProfessionals %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.service_professional_det.phone }}</td> <!-- Ensure this is available in ServiceProfessional -->
+                <td>{{ user.service_professional_det.city }}</td>  <!-- Ensure this is available in ServiceProfessional -->
+                <td>{{ user.date_joined }}</td>
+                <td>{{ user.service_professional_det.service_category }}</td>
+                <td>{{ user.service_professional_det.price_per_hour }}</td>
+                <td>{{ user.service_professional_det.status }}</td>
+                <td>
+                    <a href="#" role="button" class="btn btn-outline-primary">Edit</a>
+                    <a href="#" role="button" class="btn btn-outline-danger">Blacklist</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h3 class="h3">Pending Requests</h3>
+    <table class="table">
+        <tr>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">City</th>
+            <th scope="col">Date Joined</th>
+            <th scope="col">Service Category</th>
+            <th scope="col">Rate per hour</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+        </tr>
+        {% for user in pending_requests %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.service_professional_det.phone }}</td> 
+                <td>{{ user.service_professional_det.city }}</td>  
+                <td>{{ user.date_joined }}</td>
+                <td>{{ user.service_professional_det.service_category }}</td>
+                <td>{{ user.service_professional_det.price_per_hour }}</td>
+                <td>{{ user.service_professional_det.status }}</td>
+                <td>
+                    <a href="#" role="button" class="btn btn-outline-primary">Approve</a>
+                    <a href="#" role="button" class="btn btn-outline-danger">Decline</a>
+                    <a href="#" role="button" class="btn btn-outline-success">View details</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endblock %}      
+     {% else %}
+    <h1>Access Denied</h1>
+    <p>You do not have permission to access this page</p>
+    <a href="{{ url_for('home') }}">Go back to home</a>
+     {% endif %}
+
+

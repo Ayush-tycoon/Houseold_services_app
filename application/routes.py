@@ -2,6 +2,11 @@ from main import app
 from flask import render_template, session, redirect, url_for, request, flash
 from application.model import *
 from datetime import datetime
+import seaborn as sns
+import matplotlib.pyplot as plt
+import io
+import base64
+
 
 
 
@@ -89,8 +94,9 @@ def registercustomer():
     
 @app.route('/registerserviceprofessional', methods=['GET', 'POST'])
 def registerserviceprofessional():
+    service_categories = ServiceCategory.query.all()
     if request.method == 'GET':
-        return render_template('register_service_pro.html')
+        return render_template('register_service_pro.html', service_categories=service_categories)
     elif request.method == 'POST':
         username = request.form.get('username')
         name = request.form.get('name')
@@ -169,7 +175,9 @@ def registerserviceprofessional():
             return redirect(url_for('Login'))
 
 
-
+@app.route('/adminsummary')
+def adminsummary():
+    return render_template('admin_summary.html')
 
 
 
@@ -213,11 +221,79 @@ def Login():
                 session['user'] = user.username
                 return redirect(url_for('service_professional_dashboard'))
             elif user.role =='admin':
+                session['role'] = 'admin'
+                session['user'] = user.username
                 return redirect(url_for('admin_dashboard'))
-        
-            
+
+
+@app.route('/manageusers')
+def manageusers():
+    Customers = User.query.join(Customer).filter(User.role == 'customer').all()
+    ServiceProfessionals = User.query.join(ServiceProfessional).filter(
+        (User.role == 'service_professional') & 
+        (ServiceProfessional.status.in_(['approved', 'blacklisted']))
+    ).all()
+    
+    pending_requests = User.query.join(ServiceProfessional).filter(
+        (User.role == 'service_professional') & 
+        (ServiceProfessional.status == 'pending')
+    ).all()
+    
+    return render_template('admin_users.html', Customers=Customers, ServiceProfessionals=ServiceProfessionals, pending_requests=pending_requests)
+
+@app.route('/baseprice')
+def baseprice():
+    service_categories = ServiceCategory.query.all()
+    return render_template('baseprices.html', service_categories=service_categories)
+
+@app.route('/managecategories')
+def managecategories():
+    service_categories = ServiceCategory.query.all()
+    return render_template('admin_categories.html', service_categories=service_categories)
+
+
+@app.route('/addcategory', methods=['GET', 'POST'])
+def addcategory():
+    if request.method == 'GET':
+        return render_template('add_category.html')
+    elif request.method == 'POST':
+        name = request.form.get('name')
+        base_price = float(request.form.get('base_price'))
+        time_required = int(request.form.get('time_required'))
+        description = request.form.get('description')
+
+        service_category = ServiceCategory(name=name, base_price=base_price, time_required=time_required, description=description)
+        db.session.add(service_category)
+        db.session.commit()
+        flash('Category added successfully')
+        return redirect(url_for('managecategories'))
+    
+
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     session.pop('role', None)
     return redirect(url_for('home'))
+
+@app.route('/admin_summary')
+def admin_summary():
+    users = User.query.all()
+    service_pros = ServiceProfessional.query.all()
+
+    roles = [user.role for user in users]
+    ratings = [sp.rating for sp in service_pros if sp.rating is not None]
+
+    sns.set(style="whitegrid")
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    sns.countplot(x=roles, ax=ax)
+    ax.set_title("User Roles Distribution")
+
+    img = io.BytesIO()
+    fig.savefig(img, format='png')
+    img.seek(0)
+    plot_url = base64.b64encode(img.getvalue()).decode()
+
+    plt.close(fig) 
+
+    return render_template('admin_summary.html', plot_url=plot_url)

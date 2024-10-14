@@ -15,10 +15,19 @@
     <li class="nav-item">
       <a class="nav-link" href="{{url_for('Login')}}">Login</a>
     </li>
-    {% endif %}
-    {% if session['user'] %}
+    {% elif session['user'] %}
     <li class="nav-item">
       <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
     {% endif %}
     </li>
+    {% if session['role']=='admin' %}
+    <li class="nav-item">
+      <a class="nav-link" href="{{url_for('manageusers')}}">Manage Users</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{url_for('adminsummary')}}">Statistics</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{url_for('managecategories')}}">Manage Categories</a>
+    {% endif %}
   </ul>
