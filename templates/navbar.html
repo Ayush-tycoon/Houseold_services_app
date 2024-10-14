@@ -1,0 +1,24 @@
+<ul class="nav justify-content-end bg-info-subtle">
+    <li class="nav-item">
+      <a class="nav-link active" aria-current="page" href="/">Home</a>
+    </li>
+    {% if not session['user'] %}
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Register
+      </a>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{{url_for('registercustomer')}}">As a Customer</a></li>
+        <li><a class="dropdown-item" href="{{url_for('registerserviceprofessional')}}">As a Service Professional</a></li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{url_for('Login')}}">Login</a>
+    </li>
+    {% endif %}
+    {% if session['user'] %}
+    <li class="nav-item">
+      <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+    {% endif %}
+    </li>
+  </ul>
