@@ -20,7 +20,7 @@ def create_app():
         # Make sure to check the roles within the application context
         cust_role = User.query.filter_by(role='customer').first()
         if not cust_role:
-            c = Customer(name='John', phone='123', city='abc', address='asgkjdchgkjh',)
+            c = Customer(name='John', phone='123', city='abc', address='asgkjdchgkjh', status='approved')
             u = User(username='john', email='abc@gmail.com', role='customer', date_joined=datetime(2020, 1, 1), password = 'a', customer_det=c)
             db.session.add(u)
 

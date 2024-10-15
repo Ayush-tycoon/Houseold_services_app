@@ -1,16 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     {% if session['role'] == 'admin' %}
-        <h1>Admin Statistics</h1>
-        {% if plot_url %}
-            <img src="data:image/png;base64,{{ plot_url }}" alt="Statistics Plot">
-        {% else %}
-            <p>No data available for the plot.</p>
-        {% endif %}
+        <div class="text-center">
+            <h3 class="h3">Admin Statistics</h3>
+            {% if plot_url %}
+                <img src="data:image/png;base64,{{ plot_url }}" alt="Statistics Plot" class="img-fluid" style="max-width: 100%;">
+            {% else %}
+                <p>No data available for the plot.</p>
+            {% endif %}
+        </div>
     {% else %}
-        <h1>Access Denied</h1>
-        <p>You do not have permission to access this page</p>
-        <a href="{{ url_for('home') }}">Go back to home</a>
+        <div class="text-center">
+            <h1>Access Denied</h1>
+            <p>You do not have permission to access this page</p>
+            <a href="{{ url_for('home') }}" class="btn btn-primary">Go back to home</a>
+        </div>
     {% endif %}
+</div>
 {% endblock %}

@@ -18,6 +18,7 @@ class Customer(db.Model):
     phone = db.Column(db.String(80), nullable=False)
     city = db.Column(db.String(80), nullable=False)
     address = db.Column(db.String(200), nullable=False)
+    status = db.Column(db.String(80), nullable=False)  # ('blacklisted', 'approved')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     # Relationship to ServiceRequest (One-to-Many relationship)

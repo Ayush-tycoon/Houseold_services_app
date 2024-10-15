@@ -3,6 +3,8 @@ from flask import render_template, session, redirect, url_for, request, flash
 from application.model import *
 from datetime import datetime
 import seaborn as sns
+import matplotlib.pyplot
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -41,6 +43,7 @@ def registercustomer():
         city = request.form.get('city')
         address = request.form.get('address')
         date_joined = datetime.now()
+        status = 'approved'
 
         user = User.query.filter_by(username=username).first()
         if user:
@@ -81,7 +84,7 @@ def registercustomer():
             return redirect(url_for('registercustomer'))
         
         else:
-            customer = Customer(name=name, phone=phone, city=city, address=address)
+            customer = Customer(name=name, phone=phone, city=city, address=address, status=status)
             user = User(username=username, password=password, email=email, role=role, date_joined=date_joined, customer_det=customer)
 
             db.session.add(user)
@@ -175,11 +178,6 @@ def registerserviceprofessional():
             return redirect(url_for('Login'))
 
 
-@app.route('/adminsummary')
-def adminsummary():
-    return render_template('admin_summary.html')
-
-
 
 @app.route('/Login', methods=['GET', 'POST'])
 def Login():
@@ -206,8 +204,11 @@ def Login():
 
         elif user.role == 'service_professional':
             stat = ServiceProfessional.query.filter_by(user_id=user.id).first().status
-            if stat != 'approved':
+            if stat == 'pending':
                 flash('Your account is not approved yet')
+                return redirect(url_for('Login'))
+            elif stat == 'blacklisted':
+                flash('Your account is blacklisted, Please contact admin')
                 return redirect(url_for('Login'))
 
          
@@ -228,6 +229,7 @@ def Login():
 
 @app.route('/manageusers')
 def manageusers():
+    service_categories = ServiceCategory.query.all()
     Customers = User.query.join(Customer).filter(User.role == 'customer').all()
     ServiceProfessionals = User.query.join(ServiceProfessional).filter(
         (User.role == 'service_professional') & 
@@ -239,7 +241,7 @@ def manageusers():
         (ServiceProfessional.status == 'pending')
     ).all()
     
-    return render_template('admin_users.html', Customers=Customers, ServiceProfessionals=ServiceProfessionals, pending_requests=pending_requests)
+    return render_template('admin_users.html', Customers=Customers, ServiceProfessionals=ServiceProfessionals, pending_requests=pending_requests, service_categories=service_categories)
 
 @app.route('/baseprice')
 def baseprice():
@@ -276,24 +278,66 @@ def logout():
     return redirect(url_for('home'))
 
 @app.route('/admin_summary')
-def admin_summary():
+def adminsummary():
+
     users = User.query.all()
     service_pros = ServiceProfessional.query.all()
 
     roles = [user.role for user in users]
     ratings = [sp.rating for sp in service_pros if sp.rating is not None]
 
-    sns.set(style="whitegrid")
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4), dpi=80)
 
-    sns.countplot(x=roles, ax=ax)
-    ax.set_title("User Roles Distribution")
+    sns.countplot(x=roles, ax=ax1)
+    ax1.set_title("User Roles Distribution")
+
+    sns.histplot(ratings, bins=10, kde=True, ax=ax2)
+    ax2.set_title("Service Professionals' Ratings Distribution")
 
     img = io.BytesIO()
     fig.savefig(img, format='png')
     img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode()
+    plot_url1 = base64.b64encode(img.getvalue()).decode()
 
     plt.close(fig) 
 
-    return render_template('admin_summary.html', plot_url=plot_url)
+    return render_template('admin_summary.html', plot_url=plot_url1)
+
+
+@app.route('/approve/<int:id>')
+def approve(id):
+    user = User.query.get(id)
+    if not user:
+        flash('User not found')
+    else:
+        user.service_professional_det.status = 'approved'
+        db.session.commit()
+        flash('User approved')
+        return redirect(url_for('manageusers'))
+    
+@app.route('/decline/<int:id>')
+def decline(id):
+    user = User.query.get(id)
+    if not user:
+        flash('User not found')
+        return redirect(url_for('manageusers'))
+    
+    service_professional = user.service_professional_det
+    db.session.delete(service_professional)
+    db.session.delete(user)
+    db.session.commit()
+    flash('User deleted')
+    return redirect(url_for('manageusers'))
+
+@app.route('/blacklist/<int:id>')
+def blacklist(id):
+    user = User.query.get(id)
+    if not user:
+        flash('User not found')
+        return redirect(url_for('manageusers'))
+    
+    service_professional = user.service_professional_det
+    service_professional.status = 'blacklisted'
+    db.session.commit()
+    flash('User blacklisted')
+    return redirect(url_for('manageusers'))

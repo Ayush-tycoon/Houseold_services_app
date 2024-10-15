@@ -3,106 +3,288 @@
 
 {% block content %}
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="text-center">Welcome to the Admin Dashboard</h1>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="text-center">Welcome to the Admin Dashboard</h1>
         </div>
     </div>
-    
-    <table class='table'>
-        <p class="h3">Customers</p>
-        <tr>
-            <th scope="col">Username</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phone</th>
-            <th scope="col">City</th>
-            <th scope="col">Date Joined</th>
-            <th scope="col">Actions</th>
-        </tr>
-        {% for user in Customers %}
-            <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.customer_det.phone }}</td>  <!-- Accessing phone through customer_det -->
-                <td>{{ user.customer_det.city }}</td>   <!-- Accessing city through customer_det -->
-                <td>{{ user.date_joined }}</td>
-                <td>
-                    <a href="#" role="button" class="btn btn-outline-primary">Edit</a>
-                    <a href="#" role="button" class="btn btn-outline-danger">Delete</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+</div>
 
-    <table class="table">     
-        <h3 class="h3">Service Professionals</h3>
-        <tr>
-            <th scope="col">Username</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phone</th>
-            <th scope="col">City</th>
-            <th scope="col">Date Joined</th>
-            <th scope="col">Service Category</th>
-            <th scope="col">Rate per hour</th>
-            <th scope="col">Status</th>
-            <th scope="col">Actions</th>
-        </tr>
-        {% for user in ServiceProfessionals %}
-            <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.service_professional_det.phone }}</td> <!-- Ensure this is available in ServiceProfessional -->
-                <td>{{ user.service_professional_det.city }}</td>  <!-- Ensure this is available in ServiceProfessional -->
-                <td>{{ user.date_joined }}</td>
-                <td>{{ user.service_professional_det.service_category }}</td>
-                <td>{{ user.service_professional_det.price_per_hour }}</td>
-                <td>{{ user.service_professional_det.status }}</td>
-                <td>
-                    <a href="#" role="button" class="btn btn-outline-primary">Edit</a>
-                    <a href="#" role="button" class="btn btn-outline-danger">Blacklist</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+<!-- Customers Table -->
+<table class='table'>
+    <p class="h3">Customers</p>
+    <tr>
+        <th scope="col">Username</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone</th>
+        <th scope="col">City</th>
+        <th scope="col">Date Joined</th>
+        <th scope="col">Actions</th>
+    </tr>
+    {% for user in Customers %}
+    <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.customer_det.phone }}</td>
+        <td>{{ user.customer_det.city }}</td>
+        <td>{{ user.date_joined }}</td>
+        <td>
+            <a href="#" role="button" class="btn btn-outline-primary">Edit</a>
+            <a href="#" role="button" class="btn btn-outline-danger">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 
-    <h3 class="h3">Pending Requests</h3>
-    <table class="table">
-        <tr>
-            <th scope="col">Username</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phone</th>
-            <th scope="col">City</th>
-            <th scope="col">Date Joined</th>
-            <th scope="col">Service Category</th>
-            <th scope="col">Rate per hour</th>
-            <th scope="col">Status</th>
-            <th scope="col">Actions</th>
-        </tr>
-        {% for user in pending_requests %}
-            <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.service_professional_det.phone }}</td> 
-                <td>{{ user.service_professional_det.city }}</td>  
-                <td>{{ user.date_joined }}</td>
-                <td>{{ user.service_professional_det.service_category }}</td>
-                <td>{{ user.service_professional_det.price_per_hour }}</td>
-                <td>{{ user.service_professional_det.status }}</td>
-                <td>
-                    <a href="#" role="button" class="btn btn-outline-primary">Approve</a>
-                    <a href="#" role="button" class="btn btn-outline-danger">Decline</a>
-                    <a href="#" role="button" class="btn btn-outline-success">View details</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    {% endblock %}      
-     {% else %}
-    <h1>Access Denied</h1>
-    <p>You do not have permission to access this page</p>
-    <a href="{{ url_for('home') }}">Go back to home</a>
-     {% endif %}
+<!-- Service Professionals Table -->
+<table class="table">
+    <h3 class="h3">Service Professionals</h3>
+    <tr>
+        <th scope="col">Username</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone</th>
+        <th scope="col">City</th>
+        <th scope="col">Date Joined</th>
+        <th scope="col">Service Category</th>
+        <th scope="col">Rate per hour</th>
+        <th scope="col">Status</th>
+        <th scope="col">Actions</th>
+    </tr>
+    {% for user in ServiceProfessionals %}
+    <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.service_professional_det.phone }}</td>
+        <td>{{ user.service_professional_det.city }}</td>
+        <td>{{ user.date_joined }}</td>
+        <td>{{ user.service_professional_det.service_category }}</td>
+        <td>{{ user.service_professional_det.price_per_hour }}</td>
+        <td>{{ user.service_professional_det.status }}</td>
+        <td>
+            <a href="{{url_for('blacklist', id=user.id)}}" role="button" class="btn btn-outline-danger">Blacklist</a>
+            <a href="{{url_for('approve', id=user.id)}}" role="button" class="btn btn-outline-warning">Whitelist</a>
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit_{{user.id}}'">
+                Edit
+            </button>
 
 
+            <!-- Modal -->
+            <div class="modal fade" id='edit_{{user.id}}' tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{ url_for('registerserviceprofessional') }}" method="POST" novalidate>
+                
+                                <div class="form-group mb-3">
+                                    <label for="username">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                                    <div class="invalid-feedback">Username is required.</div>
+                                </div>
+                
+                
+                                <div class="form-group mb-3">
+                                    <label for="name">Full Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
+                                    <div class="invalid-feedback">Name is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="email">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                                    <div class="invalid-feedback">Valid email is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="password">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                                    <div class="invalid-feedback">Password is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="cpassword">Confirm Password</label>
+                                    <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Confirm password" required>
+                                    <div class="invalid-feedback">Passwords must match.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
+                                    <div class="invalid-feedback">Phone number is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="city">City</label>
+                                    <input type="text" class="form-control" id="city" name="city" placeholder="Enter city" required>
+                                    <div class="invalid-feedback">City is required.</div>
+                                </div>
+                
+                                <select class="form-select mt-3" aria-label="Default select example" name="service_category" required>
+                                    <option disabled selected>Service Category</option>
+                                    {% for category in service_categories %}
+                                    <option value="{{category.name}}">{{category.name}}</option>
+                                    {% endfor %}
+                                  </select>
+                
+                                <div class="form-group pb-3 pt-3">
+                                    <label for="experience">Experience (in years)</label>
+                                    <input type="number" class="form-control" id="experience" name="experience" placeholder="Enter experience in years" required>
+                                    <div class="invalid-feedback">Experience is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="company_name">Company Name</label>
+                                    <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Enter company name" required>
+                                    <div class="invalid-feedback">Company name is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="price_per_hour">Price Per Hour (in Rs)</label>
+                                    <input type="number" class="form-control" id="price_per_hour" name="price_per_hour" placeholder="Enter price per hour" required>
+                                    <div class="invalid-feedback">Price per hour is required.</div>
+                                    <p>Please enter prices above or matching the base prices. <a href="{{url_for('baseprice')}}" target="_blank">check the base prices</a> </p>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="expenses_per_hour">Expenses Per Hour (in Rs) -- Optional</label>
+                                    <input type="number" class="form-control" id="expenses_per_hour" name="expenses_per_hour" placeholder="Enter expenses per hour" required>
+                                    <div class="invalid-feedback">Expenses per hour is required.</div>
+                                </div>
+                
+                                <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Pending Requests Table -->
+<h3 class="h3">Pending Requests</h3>
+<table class="table">
+    <tr>
+        <th scope="col">Username</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone</th>
+        <th scope="col">City</th>
+        <th scope="col">Date Joined</th>
+        <th scope="col">Service Category</th>
+        <th scope="col">Rate per hour</th>
+        <th scope="col">Status</th>
+        <th scope="col">Actions</th>
+    </tr>
+    {% for user in pending_requests %}
+    <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.service_professional_det.phone }}</td>
+        <td>{{ user.service_professional_det.city }}</td>
+        <td>{{ user.date_joined }}</td>
+        <td>{{ user.service_professional_det.service_category }}</td>
+        <td>{{ user.service_professional_det.price_per_hour }}</td>
+        <td>{{ user.service_professional_det.status }}</td>
+        <td>
+            <a href="{{ url_for('approve', id=user.id) }}" role="button" class="btn btn-outline-success">Approve</a>
+            <a href="{{ url_for('decline', id=user.id) }}" role="button" class="btn btn-outline-danger">Decline</a>
+
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                data-bs-target="#detailsModal-{{ user.id }}">
+                View Details
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="detailsModal-{{ user.id }}" data-bs-backdrop="static" data-bs-keyboard="false"
+                tabindex="-1" aria-labelledby="detailsModalLabel-{{ user.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="detailsModalLabel-{{ user.id }}">Details of {{
+                                user.service_professional_det.name }}</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table">
+                                <tr>
+                                    <th scope="row">ID</th>
+                                    <td>{{ user.service_professional_det.id }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">User ID</th>
+                                    <td>{{ user.id }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Name</th>
+                                    <td>{{ user.service_professional_det.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Username</th>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Email</th>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Company Name</th>
+                                    <td>{{ user.service_professional_det.company_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Phone</th>
+                                    <td>{{ user.service_professional_det.phone }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">City</th>
+                                    <td>{{ user.service_professional_det.city }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Date Joined</th>
+                                    <td>{{ user.date_joined }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Service Category</th>
+                                    <td>{{ user.service_professional_det.service_category }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Rate per hour</th>
+                                    <td>{{ user.service_professional_det.price_per_hour }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Expenses per hour</th>
+                                    <td>{{ user.service_professional_det.expenses_per_hour }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Status</th>
+                                    <td>{{ user.service_professional_det.status }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
+{% else %}
+<h1>Access Denied</h1>
+<p>You do not have permission to access this page</p>
+<a href="{{ url_for('home') }}">Go back to home</a>
+{% endif %}
