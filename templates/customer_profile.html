@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h4>Your Profile</h4>
+        <p><strong>Name:</strong> {{ customer.name }}</p>
+        <p><strong>Phone:</strong> {{ customer.phone }}</p>
+        <p><strong>City:</strong> {{ customer.city }}</p>
+        <p><strong>Status:</strong> {{ customer.status }}</p>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,11 +1,71 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="text-center">Welcome to the Customer Dashboard</h1>
-            </div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>Welcome, {{ customer.name }}!</h2>
+            <p>Here is your dashboard.</p>
         </div>
     </div>
+
+    <!-- Search Bar Section -->
+    <div class="row mb-4">
+        <div class="col-12 col-md-8 offset-md-2">
+            <form class="d-flex flex-column flex-md-row align-items-center" action="{{ url_for('search_services') }}" method="GET">
+                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="query" placeholder="Search by Name" value="{{ query }}">
+                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="city" placeholder="Search by City" value="{{ city }}">
+                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="service_category" placeholder="Search by Service Category" value="{{ service_category }}">
+                <button class="btn btn-primary mt-2 mt-md-0" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    
+    
+
+    <!-- Service Professionals Search Results -->
+    {% if services %}
+    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;"></div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4>Search Results</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Service Category</th>
+                        <th>City</th>
+                        <th>Rating</th>
+                        <th>Experience</th>
+                        <th>Price per Hour</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                        <tr>
+                            <td>{{ service.name }}</td>
+                            <td>{{ service.service_category }}</td>
+                            <td>{{ service.city }}</td>
+                            <td>{{ service.rating or 'N/A' }}</td>
+                            <td>{{ service.experience }} years</td>
+                            <td>{{ service.price_per_hour }} Rs</td>
+                            <td>
+                                <a href="{{ url_for('view_service_request', request_id=service.id) }}" class="btn btn-info btn-sm">View</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">No service professionals found matching your search.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+    {% endif %}
+
+    <!-- Your Profile Section -->
+    
 {% endblock %}

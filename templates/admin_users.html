@@ -6,41 +6,124 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1 class="text-center">Welcome to the Admin Dashboard</h1>
+            <h1 class="text-center">Manage Users</h1>
         </div>
     </div>
 </div>
 
-<!-- Customers Table -->
-<table class='table'>
-    <p class="h3">Customers</p>
+
+<div class="container">
+<!-- customer table -->
+ <div class="row">
+    <h3 class="h3 text-center mt-5">Customers</h3>
+    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+<table class='table table-bordered table-striped mt-4'>
+    <thead class="thead-dark">
     <tr>
+        <th scope="col">User_id</th>
+        <th scope="col">Customer_id</th>
         <th scope="col">Username</th>
         <th scope="col">Email</th>
         <th scope="col">Phone</th>
         <th scope="col">City</th>
         <th scope="col">Date Joined</th>
+        <th scope="col">Status</th>
         <th scope="col">Actions</th>
     </tr>
+    </thead>
     {% for user in Customers %}
     <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.customer_det.id }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.customer_det.phone }}</td>
         <td>{{ user.customer_det.city }}</td>
         <td>{{ user.date_joined }}</td>
+        <td>{{ user.customer_det.status }}</td>
         <td>
-            <a href="#" role="button" class="btn btn-outline-primary">Edit</a>
-            <a href="#" role="button" class="btn btn-outline-danger">Delete</a>
+            {%if user.customer_det.status == 'inactive'%}
+            <a href="{{url_for('active', id=user.id)}}" role="button" class="btn btn-outline-success">Active</a>
+            {%else%}
+            <a href="{{url_for('inactive', id=user.id)}}" role="button" class="btn btn-outline-danger">Inactive</a>
+            {% endif %}
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editcust_{{user.id}}">
+                Edit
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="editcust_{{user.id}}" tabindex="-1" aria-labelledby="editcust_{{user.id}}"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="editcust_{{user.id}}">Modal title</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{ url_for('editcustomer', id=user.id) }}" method="POST" novalidate>
+                                <div class="form-group mb-3">
+                                    <label for="username">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" value="{{user.username}}" required>
+                                    <div class="invalid-feedback">Username is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="name">Full Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{user.customer_det.name}}" required>
+                                    <div class="invalid-feedback">Name is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="email">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" required>
+                                    <div class="invalid-feedback">Valid email is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{user.customer_det.phone}}" required>
+                                    <div class="invalid-feedback">Phone number is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="city">City</label>
+                                    <input type="text" class="form-control" id="city" name="city" value="{{user.customer_det.city}}" required>
+                                    <div class="invalid-feedback">City is required.</div>
+                                </div>
+                
+                                <div class="form-group mb-3">
+                                    <label for="address">Address</label>
+                                    <textarea class="form-control" id="address" name="address" rows="3" required>{{user.customer_det.address}}</textarea>
+                                    <div class="invalid-feedback">Address is required.</div>
+                                </div>
+                
+                                <button type="submit" class="btn btn-primary ">Save Changes</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger btn-block">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </td>
     </tr>
     {% endfor %}
 </table>
+</div>
+</div>
 
+
+<div class="row">
 <!-- Service Professionals Table -->
-<table class="table">
-    <h3 class="h3">Service Professionals</h3>
+<h3 class="h3 text-center mt-5">Service Professionals</h3>
+<div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+<table class="table table-bordered table-striped mt-4">
     <tr>
+        <th scope="col">User_id</th>
+        <th scope="col">ServicePro_id</th>
         <th scope="col">Username</th>
         <th scope="col">Email</th>
         <th scope="col">Phone</th>
@@ -53,6 +136,8 @@
     </tr>
     {% for user in ServiceProfessionals %}
     <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.service_professional_det.id }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.service_professional_det.phone }}</td>
@@ -62,106 +147,111 @@
         <td>{{ user.service_professional_det.price_per_hour }}</td>
         <td>{{ user.service_professional_det.status }}</td>
         <td>
+            {%if user.service_professional_det.status == 'approved'%}
             <a href="{{url_for('blacklist', id=user.id)}}" role="button" class="btn btn-outline-danger">Blacklist</a>
+            {%else%}
             <a href="{{url_for('approve', id=user.id)}}" role="button" class="btn btn-outline-warning">Whitelist</a>
+            {% endif %}
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit_{{user.id}}'">
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                data-bs-target="#edit_{{user.id}}">
                 Edit
             </button>
 
 
             <!-- Modal -->
-            <div class="modal fade" id='edit_{{user.id}}' tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id='edit_{{user.id}}' tabindex="-1" aria-labelledby='edit_{{user.id}}'
                 aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                            <h1 class="modal-title fs-5" id='edit_{{user.id}}'>Modal title</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{ url_for('registerserviceprofessional') }}" method="POST" novalidate>
-                
+                            <form action="{{ url_for('edit_service_pro', id=user.id) }}" method="POST" novalidate>
+
                                 <div class="form-group mb-3">
                                     <label for="username">Username</label>
-                                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                                    <input type="text" class="form-control" id="username" name="username"
+                                        value="{{user.username}}" required>
                                     <div class="invalid-feedback">Username is required.</div>
                                 </div>
-                
-                
+
+
                                 <div class="form-group mb-3">
                                     <label for="name">Full Name</label>
-                                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                        value="{{user.service_professional_det.name}}" required>
                                     <div class="invalid-feedback">Name is required.</div>
                                 </div>
-                
+
                                 <div class="form-group mb-3">
                                     <label for="email">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                        value="{{user.email}}" required>
                                     <div class="invalid-feedback">Valid email is required.</div>
                                 </div>
-                
-                                <div class="form-group mb-3">
-                                    <label for="password">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
-                                    <div class="invalid-feedback">Password is required.</div>
-                                </div>
-                
-                                <div class="form-group mb-3">
-                                    <label for="cpassword">Confirm Password</label>
-                                    <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Confirm password" required>
-                                    <div class="invalid-feedback">Passwords must match.</div>
-                                </div>
-                
+
                                 <div class="form-group mb-3">
                                     <label for="phone">Phone Number</label>
-                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
+                                    <input type="tel" class="form-control" id="phone" name="phone"
+                                        value="{{user.service_professional_det.phone}}" required>
                                     <div class="invalid-feedback">Phone number is required.</div>
                                 </div>
-                
+
                                 <div class="form-group mb-3">
                                     <label for="city">City</label>
-                                    <input type="text" class="form-control" id="city" name="city" placeholder="Enter city" required>
+                                    <input type="text" class="form-control" id="city" name="city"
+                                        value="{{user.service_professional_det.city}}" required>
                                     <div class="invalid-feedback">City is required.</div>
                                 </div>
-                
-                                <select class="form-select mt-3" aria-label="Default select example" name="service_category" required>
-                                    <option disabled selected>Service Category</option>
+
+                                <select class="form-select mt-3" aria-label="Default select example"
+                                    name='service_category' required>
+                                    <option selected>{{user.service_professional_det.service_category}}</option>
                                     {% for category in service_categories %}
                                     <option value="{{category.name}}">{{category.name}}</option>
                                     {% endfor %}
-                                  </select>
-                
+                                </select>
+
                                 <div class="form-group pb-3 pt-3">
                                     <label for="experience">Experience (in years)</label>
-                                    <input type="number" class="form-control" id="experience" name="experience" placeholder="Enter experience in years" required>
+                                    <input type="number" class="form-control" id="experience" name="experience"
+                                        value="{{user.service_professional_det.experience}}" required>
                                     <div class="invalid-feedback">Experience is required.</div>
                                 </div>
-                
+
                                 <div class="form-group mb-3">
                                     <label for="company_name">Company Name</label>
-                                    <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Enter company name" required>
+                                    <input type="text" class="form-control" id="company_name" name="company_name"
+                                        value="{{user.service_professional_det.company_name}}" required>
                                     <div class="invalid-feedback">Company name is required.</div>
                                 </div>
-                
+
                                 <div class="form-group mb-3">
                                     <label for="price_per_hour">Price Per Hour (in Rs)</label>
-                                    <input type="number" class="form-control" id="price_per_hour" name="price_per_hour" placeholder="Enter price per hour" required>
+                                    <input type="number" class="form-control" id="price_per_hour" name="price_per_hour"
+                                        value="{{user.service_professional_det.price_per_hour}}" required>
                                     <div class="invalid-feedback">Price per hour is required.</div>
-                                    <p>Please enter prices above or matching the base prices. <a href="{{url_for('baseprice')}}" target="_blank">check the base prices</a> </p>
+                                    <p>Please enter prices above or matching the base prices. <a
+                                            href="{{url_for('baseprice')}}" target="_blank">check the base prices</a>
+                                    </p>
                                 </div>
-                
+
                                 <div class="form-group mb-3">
                                     <label for="expenses_per_hour">Expenses Per Hour (in Rs) -- Optional</label>
-                                    <input type="number" class="form-control" id="expenses_per_hour" name="expenses_per_hour" placeholder="Enter expenses per hour" required>
+                                    <input type="number" class="form-control" id="expenses_per_hour"
+                                        name="expenses_per_hour"
+                                        value="{{user.service_professional_det.expenses_per_hour}}" required>
                                     <div class="invalid-feedback">Expenses per hour is required.</div>
                                 </div>
-                
+
                                 <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger btn-block" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -170,10 +260,15 @@
     </tr>
     {% endfor %}
 </table>
+</div>
+</div>
 
+
+<div class="row">
 <!-- Pending Requests Table -->
-<h3 class="h3">Pending Requests</h3>
-<table class="table">
+<div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+<table class="table table-bordered table-striped mt-4">
+    <h3 class="h3 text-center mt-5">Pending Requests</h3>
     <tr>
         <th scope="col">Username</th>
         <th scope="col">Email</th>
@@ -197,7 +292,7 @@
         <td>{{ user.service_professional_det.status }}</td>
         <td>
             <a href="{{ url_for('approve', id=user.id) }}" role="button" class="btn btn-outline-success">Approve</a>
-            <a href="{{ url_for('decline', id=user.id) }}" role="button" class="btn btn-outline-danger">Decline</a>
+            <a href="{{ url_for('delete', id=user.id) }}" role="button" class="btn btn-outline-danger">Decline</a>
 
             <!-- Button trigger modal -->
             <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
@@ -281,7 +376,9 @@
     </tr>
     {% endfor %}
 </table>
-
+</div>
+</div>
+</div>
 {% endblock %}
 {% else %}
 <h1>Access Denied</h1>

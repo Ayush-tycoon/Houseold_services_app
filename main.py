@@ -3,6 +3,7 @@ from application.database import db
 from application.config import config
 from application.model import *
 from datetime import datetime
+from flask_migrate import Migrate
 
 
 def create_app():
@@ -10,14 +11,16 @@ def create_app():
     
     app.config.from_object(config)
     app.config['DEBUG'] = True
+    
 
     db.init_app(app)
 
 
     with app.app_context():
-        db.create_all()  # This ensures the tables are created
-        
+        #db.create_all()  # This ensures the tables are created
+        db.create_all()
         # Make sure to check the roles within the application context
+        
         cust_role = User.query.filter_by(role='customer').first()
         if not cust_role:
             c = Customer(name='John', phone='123', city='abc', address='asgkjdchgkjh', status='approved')
@@ -37,12 +40,12 @@ def create_app():
 
         sr = ServiceRequest.query.first()
         if not sr:
-            sr = ServiceRequest(customer_id=1, service_professional_id=1, service_category_id=1, date_request=datetime(2020, 1, 1), date_completion=datetime(2020, 1, 2), status='completed', rating=4.5, feedback='good')
+            sr = ServiceRequest(customer_id=1, service_professional_id=1, service_category_id=1, service_category='electrician' ,date_request=datetime(2020, 1, 1), date_completion=datetime(2020, 1, 2), status='completed', rating=4.5, feedback='good')
             db.session.add(sr)
         
         sc = ServiceCategory.query.first()
         if not sc:
-            sc = ServiceCategory(name='Electrician', base_price=100, time_required=2, description='Electrician')
+            sc = ServiceCategory(name='electrician', base_price=100, time_required=2, description='Electrician', status='active')
             db.session.add(sc)
 
         r = Review.query.first()
@@ -54,7 +57,9 @@ def create_app():
     return app
 
 app = create_app()
+
 from application.routes import *
+migrate = Migrate(app, db)
 
 
 if __name__ == '__main__':

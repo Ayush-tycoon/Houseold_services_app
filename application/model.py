@@ -18,7 +18,7 @@ class Customer(db.Model):
     phone = db.Column(db.String(80), nullable=False)
     city = db.Column(db.String(80), nullable=False)
     address = db.Column(db.String(200), nullable=False)
-    status = db.Column(db.String(80), nullable=False)  # ('blacklisted', 'approved')
+    status = db.Column(db.String(80), nullable=False)  # ('active', 'inactive')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     # Relationship to ServiceRequest (One-to-Many relationship)
@@ -47,12 +47,15 @@ class ServiceCategory(db.Model):
     base_price = db.Column(db.Float, nullable=False)
     time_required = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(80), nullable=False)
+    status = db.Column(db.String(80), nullable=False)
+    
 
 class ServiceRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     service_professional_id = db.Column(db.Integer, db.ForeignKey('service_professional.id'), nullable=False)
-    service_category_id = db.Column(db.Integer, db.ForeignKey('service_category.id'), nullable=False)
+    service_category_id = db.Column(db.Integer, db.ForeignKey('service_category.id', ondelete='SET NULL'), nullable=True)
+    service_category = db.Column(db.String(80), nullable=False)
     date_request = db.Column(db.DateTime, nullable=False)
     date_completion = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(80), nullable=False)  # ('completed', 'requested', 'denied', 'in_progress')

@@ -16,9 +16,68 @@ import base64
 def home():
     return render_template('home.html')
 
-@app.route('/customer_dashboard')
+@app.route('/customer/dashboard')
 def customer_dashboard():
-    return render_template('customer_dash.html')
+    user_id = session.get('user_id')  
+    if not user_id:
+        return redirect('/login')  
+    customer = Customer.query.filter_by(user_id=user_id).first()  
+
+    if not customer:
+        return "Customer not found", 404
+
+    service_requests = ServiceRequest.query.filter_by(customer_id=customer.id).all()
+
+    return render_template('customer_dash.html', customer=customer, service_requests=service_requests)
+ 
+@app.route('/customer/search_services', methods=['GET'])
+def search_services():
+    query = request.args.get('query', '')  # For name of the service professional
+    city = request.args.get('city', '')    # For filtering by city
+    service_category = request.args.get('service_category', '')  # For filtering by service category
+
+    user_id = session.get('user_id')  # Get user ID from session
+    customer = Customer.query.filter_by(user_id=user_id).first()  # Get customer details
+
+    # Construct the query for service professionals
+    query_filters = [ServiceProfessional.status == 'approved']  # Filter only approved service professionals
+
+    if query:
+        query_filters.append(ServiceProfessional.name.like(f'%{query}%'))
+    if city:
+        query_filters.append(ServiceProfessional.city.like(f'%{city}%'))
+    if service_category:
+        query_filters.append(ServiceProfessional.service_category.like(f'%{service_category}%'))
+
+    # Apply filters to the query
+    serviceprofessionals = ServiceProfessional.query.filter(*query_filters).all()
+
+    return render_template('customer_dash.html', services=serviceprofessionals, query=query, city=city, service_category=service_category, customer=customer)
+
+@app.route('/customer/profile')
+def customer_profile():
+    Customer_id = session.get('user_id')
+    customer = Customer.query.filter_by(user_id=Customer_id).first()
+    return render_template('customer_profile.html', customer=customer)
+
+
+@app.route('/customer/create_service_request')
+def create_service_request():
+    # Render a form to create a new service request
+    return render_template('create_service_request.html')
+
+@app.route('/customer/close_request/<int:request_id>')
+def close_service_request(request_id):
+    service_request = ServiceRequest.query.get(request_id)
+    if service_request:
+        service_request.status = 'closed'
+        db.session.commit()
+    return redirect(url_for('customer_dashboard'))
+
+@app.route('/customer/view_request/<int:request_id>')
+def view_service_request(request_id):
+    service_request = ServiceRequest.query.get(request_id)
+    return render_template('view_service_request.html', request=service_request)   
 
 @app.route('/service_professional_dashboard')
 def service_professional_dashboard():
@@ -43,7 +102,7 @@ def registercustomer():
         city = request.form.get('city')
         address = request.form.get('address')
         date_joined = datetime.now()
-        status = 'approved'
+        status = 'active'
 
         user = User.query.filter_by(username=username).first()
         if user:
@@ -91,8 +150,6 @@ def registercustomer():
             db.session.commit()
             flash('User registered successfully')
             return redirect(url_for('Login'))
-
-
 
     
 @app.route('/registerserviceprofessional', methods=['GET', 'POST'])
@@ -176,56 +233,7 @@ def registerserviceprofessional():
             db.session.commit()
             flash('User registered successfully! Please wait for approval')
             return redirect(url_for('Login'))
-
-
-
-@app.route('/Login', methods=['GET', 'POST'])
-def Login():
-    if request.method == 'GET':
-        return render_template('login.html')
-    else:
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        if not username or not password:
-            flash('Please enter username and password both')
-            return redirect(url_for('Login'))
         
-        user = User.query.filter_by(username=username).first()
-
-        if not user:
-            flash('User not found, Register Please!')
-            return redirect(url_for('Login'))
-
-        elif user.password != password:
-            flash('Password is incorrect')
-            return redirect(url_for('Login'))
-
-
-        elif user.role == 'service_professional':
-            stat = ServiceProfessional.query.filter_by(user_id=user.id).first().status
-            if stat == 'pending':
-                flash('Your account is not approved yet')
-                return redirect(url_for('Login'))
-            elif stat == 'blacklisted':
-                flash('Your account is blacklisted, Please contact admin')
-                return redirect(url_for('Login'))
-
-         
-        else:
-            if user.role =='customer':
-                session['role'] = 'customer'
-                session['user'] = user.username
-                return redirect(url_for('customer_dashboard'))
-            elif user.role =='service_professional':
-                session['role'] = 'service_professional'
-                session['user'] = user.username
-                return redirect(url_for('service_professional_dashboard'))
-            elif user.role =='admin':
-                session['role'] = 'admin'
-                session['user'] = user.username
-                return redirect(url_for('admin_dashboard'))
-
 
 @app.route('/manageusers')
 def manageusers():
@@ -263,19 +271,118 @@ def addcategory():
         base_price = float(request.form.get('base_price'))
         time_required = int(request.form.get('time_required'))
         description = request.form.get('description')
+        status = 'active'
 
-        service_category = ServiceCategory(name=name, base_price=base_price, time_required=time_required, description=description)
+        service_category = ServiceCategory(name=name, base_price=base_price, time_required=time_required, description=description, status=status)
         db.session.add(service_category)
         db.session.commit()
         flash('Category added successfully')
         return redirect(url_for('managecategories'))
+
+@app.route('/delcategory/<int:id>')
+def deletecategory(id):
+    service_category = ServiceCategory.query.get(id)
+    if not service_category:
+        flash('Category not found')
+    else:
+        update = service_category.status = 'inactive'
+        db.session.commit()
+        flash('Category deleted')
+        return redirect(url_for('managecategories'))
     
+@app.route('/actcategory/<int:id>')
+def activecategory(id):
+    service_category = ServiceCategory.query.get(id)
+    if not service_category:
+        flash('Category not found')
+    else:
+        update = service_category.status = 'active'
+        db.session.commit()
+        flash('Category Activated')
+        return redirect(url_for('managecategories'))   
+    
+@app.route('/editcategory/<int:id>', methods=['POST'])
+def editcategory(id):
+    category = ServiceCategory.query.get_or_404(id)
+    if request.method == 'POST' and category.status == 'active':
+        category.name = request.form['name']
+        category.base_price = request.form['base_price']
+        category.time_required = request.form['time_required']
+        category.description = request.form['description']
+        category.status = 'active'
+        
+        try:
+            db.session.commit()
+            flash('Category updated successfully!', 'success')
+        except:
+            db.session.rollback()
+            flash('Error updating category. Please try again.', 'danger')
+        
+    return redirect(url_for('managecategories')) 
+
+
+@app.route('/Login', methods=['GET', 'POST'])
+def Login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    else:
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if not username or not password:
+            flash('Please enter username and password both')
+            return redirect(url_for('Login'))
+
+        user = User.query.filter_by(username=username).first()
+
+        if not user:
+            flash('User not found, Register Please!')
+            return redirect(url_for('Login'))
+
+        elif user.password != password:
+            flash('Password is incorrect')
+            return redirect(url_for('Login'))
+
+        # Check the user's role and status based on their role
+        if user.role == 'customer':
+            status = Customer.query.filter_by(user_id=user.id).first().status
+            if status == 'inactive':
+                flash('Your account is blocked, Please contact admin')
+                return redirect(url_for('Login'))
+
+            session['role'] = 'customer'
+            session['user_id'] = user.id
+            return redirect(url_for('customer_dashboard'))
+
+        elif user.role == 'service_professional':
+            stat = ServiceProfessional.query.filter_by(user_id=user.id).first().status
+            if stat == 'pending':
+                flash('Your account is not approved yet')
+                return redirect(url_for('Login'))
+            elif stat == 'blacklisted':
+                flash('Your account is blacklisted, Please contact admin')
+                return redirect(url_for('Login'))
+
+            session['role'] = 'service_professional'
+            session['user_id'] = user.id
+            return redirect(url_for('service_professional_dashboard'))
+
+        elif user.role == 'admin':
+            session['role'] = 'admin'
+            session['user'] = user.username
+            return redirect(url_for('admin_dashboard'))
+
+        
+        flash('Unexpected role, please contact support.')
+        return redirect(url_for('Login'))
+   
 
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     session.pop('role', None)
     return redirect(url_for('home'))
+
 
 @app.route('/admin_summary')
 def adminsummary():
@@ -315,19 +422,43 @@ def approve(id):
         flash('User approved')
         return redirect(url_for('manageusers'))
     
-@app.route('/decline/<int:id>')
-def decline(id):
+@app.route('/delete/<int:id>')
+def delete(id):
     user = User.query.get(id)
     if not user:
         flash('User not found')
         return redirect(url_for('manageusers'))
     
-    service_professional = user.service_professional_det
-    db.session.delete(service_professional)
-    db.session.delete(user)
+    if user.role == 'service_professional':
+        service_professional = user.service_professional_det
+        db.session.delete(service_professional)
+        db.session.delete(user)
+        db.session.commit()
+        flash('User deleted')
+        return redirect(url_for('manageusers'))
+    
+@app.route('/activate/<int:id>')
+def active(id):
+    user = User.query.get(id)
+    if not user:
+        flash('User not found')
+        return redirect(url_for('manageusers'))
+    user.customer_det.status = 'active'
     db.session.commit()
-    flash('User deleted')
+    flash('User activated')
     return redirect(url_for('manageusers'))
+    
+@app.route('/inactive/<int:id>')
+def inactive(id):
+    user = User.query.get(id)
+    if not user:
+        flash('User not found')
+        return redirect(url_for('manageusers'))
+    user.customer_det.status = 'inactive'
+    db.session.commit()
+    flash('User inactivated')
+    return redirect(url_for('manageusers'))
+
 
 @app.route('/blacklist/<int:id>')
 def blacklist(id):
@@ -341,3 +472,81 @@ def blacklist(id):
     db.session.commit()
     flash('User blacklisted')
     return redirect(url_for('manageusers'))
+
+@app.route('/edit_service_pro/<int:id>', methods=['GET', 'POST'])
+def edit_service_pro(id):
+    
+    user = User.query.get(id)
+    if not user:
+        flash('User not found')
+    service_pro = user.service_professional_det
+
+    if request.method == 'POST':
+        
+        username = request.form.get('username')
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        city = request.form.get('city')
+        service_category = request.form.get('service_category')
+        experience = request.form.get('experience')
+        company_name = request.form.get('company_name')
+        price_per_hour = request.form.get('price_per_hour')
+        expenses_per_hour = request.form.get('expenses_per_hour')
+
+        if not username or not name or not email or not phone or not city or not service_category or not experience or not company_name or not price_per_hour:
+            flash('Please fill all the fields')
+            return redirect(url_for('manageusers', id=id))
+        
+        user.username = username
+        user.email = email
+
+        
+        service_pro.name = name
+        service_pro.phone = phone
+        service_pro.city = city
+        service_pro.service_category = service_category
+        service_pro.experience = int(experience)
+        service_pro.company_name = company_name
+        service_pro.price_per_hour = float(price_per_hour)
+        service_pro.expenses_per_hour = int(float(expenses_per_hour)) if expenses_per_hour else 0
+
+        
+        db.session.commit()
+        flash('Service Professional updated successfully!', 'success')
+
+        return redirect(url_for('manageusers'))  
+
+@app.route('/editcust/<int:id>', methods=['GET', 'POST'])
+def editcustomer(id):
+    user = User.query.get(id)
+    if not user:
+        flash('User not found')
+
+    customer = user.customer_det
+    if request.method == 'POST':
+        username = request.form.get('username')
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        city = request.form.get('city')
+        address = request.form.get('address')
+
+        if not username or not name or not email or not phone or not city or not address:
+            flash('Please fill all the fields')
+            return redirect(url_for('manageusers', id=id))
+        
+        user.username = username
+        user.email = email
+
+        customer.name = name
+        customer.phone = phone
+        customer.city = city
+        customer.address = address
+
+        db.session.commit()
+        flash('Customer updated successfully!')
+
+        return redirect(url_for('manageusers'))
+
+    

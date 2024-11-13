@@ -1,34 +1,49 @@
-<ul class="nav justify-content-end bg-info-subtle">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="/">Home</a>
-    </li>
-    {% if not session['user'] %}
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Register
-      </a>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="{{url_for('registercustomer')}}">As a Customer</a></li>
-        <li><a class="dropdown-item" href="{{url_for('registerserviceprofessional')}}">As a Service Professional</a></li>
+<nav class="navbar navbar-expand-lg navbar-light bg-info-subtle">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Home</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        {% if not session['role'] %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Register
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="{{ url_for('registercustomer') }}">As a Customer</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('registerserviceprofessional') }}">As a Service Professional</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('Login') }}">Login</a>
+        </li>
+        {% elif session['role'] == 'admin' %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('adminsummary') }}">Statistics</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('manageusers') }}">Manage Users</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('managecategories') }}">Manage Categories</a>
+        </li>
+        {% elif session['role'] == 'customer' %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('customer_dashboard') }}">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('customer_profile') }}">My Profile</a>
+        </li>
+        {%endif%}
+        {% if session['role'] %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+        </li>
+        {% endif %}
       </ul>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{url_for('Login')}}">Login</a>
-    </li>
-   
-    </li>
-    {% elif session['role']=='admin' %}
-    <li class="nav-item">
-      <a class="nav-link" href="{{url_for('adminsummary')}}">Statistics</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{url_for('manageusers')}}">Manage Users</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{url_for('managecategories')}}">Manage Categories</a>
-      {% endif %}
-    {% if session['user'] %}
-    <li class="nav-item">
-      <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
-    {% endif %}
-  </ul>
+
+    </div>
+  </div>
+</nav>

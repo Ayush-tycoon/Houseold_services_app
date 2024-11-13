@@ -53,7 +53,9 @@
                 <select class="form-select mt-3" aria-label="Default select example" name="service_category" required>
                     <option disabled selected>Service Category</option>
                     {% for category in service_categories %}
+                    {% if category.status == 'active' %}
                     <option value="{{category.name}}">{{category.name}}</option>
+                    {% endif %}
                     {% endfor %}
                   </select>
 
