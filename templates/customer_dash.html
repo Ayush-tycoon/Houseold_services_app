@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-12 text-center">
             <h2>Welcome, {{ customer.name }}!</h2>
-            <p>Here is your dashboard.</p>
+            <p>Search for services</p>
         </div>
     </div>
 
@@ -20,52 +20,69 @@
             </form>
         </div>
     </div>
-    
-    
 
     <!-- Service Professionals Search Results -->
     {% if services %}
-    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;"></div>
     <div class="row mb-4">
         <div class="col-12">
             <h4>Search Results</h4>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Service Category</th>
-                        <th>City</th>
-                        <th>Rating</th>
-                        <th>Experience</th>
-                        <th>Price per Hour</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for service in services %}
-                        <tr>
-                            <td>{{ service.name }}</td>
-                            <td>{{ service.service_category }}</td>
-                            <td>{{ service.city }}</td>
-                            <td>{{ service.rating or 'N/A' }}</td>
-                            <td>{{ service.experience }} years</td>
-                            <td>{{ service.price_per_hour }} Rs</td>
-                            <td>
-                                <a href="{{ url_for('view_service_request', request_id=service.id) }}" class="btn btn-info btn-sm">View</a>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="8" class="text-center">No service professionals found matching your search.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for service in services %}
+        <div class="col-12 col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ service.service_category }} - {{ service.city }}</h6>
+                    <p class="card-text">
+                        <strong>Rating:</strong> {{ service.rating or 'N/A' }}<br>
+                        <strong>Experience:</strong> {{ service.experience }} years<br>
+                        <strong>Price per Hour:</strong> {{ service.price_per_hour }} Rs<br>
+                        <strong>Phone:</strong> {{ service.phone }}<br>
+                    </p>
+                    <!-- Button to trigger modal -->
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#serviceRequestModal{{ service.id }}">Send Service Request</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal for Service Request -->
+{% for service in services %}
+<div class="modal fade" id="serviceRequestModal{{ service.id }}" tabindex="-1" aria-labelledby="serviceRequestModalLabel{{ service.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serviceRequestModalLabel{{ service.id }}">Service Request for {{ service.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Service Request Form -->
+                <form action="{{ url_for('submit_service_request') }}" method="POST">
+                    <input type="hidden" name="service_professional_id" value="{{ service.id }}">
+                    <div class="mb-3">
+                        <label for="service_category" class="form-label">Service Category</label>
+                        <input type="text" class="form-control" id="service_category" name="service_category" value="{{ service.service_category }}" required readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date_completion" class="form-label">Service order date</label>
+                        <input type="datetime-local" class="form-control" id="date_completion" name="date_completion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="feedback" class="form-label">Remarks</label>
+                        <textarea class="form-control" id="feedback" name="feedback" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-    {% endif %}
+{% endfor %}
 
-    <!-- Your Profile Section -->
-    
 {% endblock %}

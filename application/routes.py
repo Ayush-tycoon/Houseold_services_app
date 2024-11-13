@@ -8,7 +8,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 import base64
-
+from datetime import datetime
+from flask import request, redirect, url_for, flash
 
 
 
@@ -54,30 +55,162 @@ def search_services():
 
     return render_template('customer_dash.html', services=serviceprofessionals, query=query, city=city, service_category=service_category, customer=customer)
 
+@app.route('/customer/orders')
+def customer_orders():
+    user_id = session.get('user_id')
+    customer = Customer.query.filter_by(user_id=user_id).first()
+    service_requests = ServiceRequest.query.filter_by(customer_id=customer.id).all()
+    for request in service_requests:
+        request.review = Review.query.filter_by(ServiceRequest_id=request.id).first()
+    return render_template('customer_orders.html', service_requests=service_requests)
+
 @app.route('/customer/profile')
 def customer_profile():
     Customer_id = session.get('user_id')
     customer = Customer.query.filter_by(user_id=Customer_id).first()
     return render_template('customer_profile.html', customer=customer)
 
+@app.route('/profile/edit', methods=['GET', 'POST'])
+def edit_customer():
+    customer = Customer.query.get(1)  # Assuming you're fetching the customer by ID, you can modify this based on your context.
 
-@app.route('/customer/create_service_request')
-def create_service_request():
-    # Render a form to create a new service request
-    return render_template('create_service_request.html')
+    if request.method == 'POST':
+        # Update customer details based on form data
+        customer.name = request.form['name']
+        customer.phone = request.form['phone']
+        customer.city = request.form['city']
+        customer.address = request.form['address']
+        customer.status = 'approved'
 
-@app.route('/customer/close_request/<int:request_id>')
-def close_service_request(request_id):
-    service_request = ServiceRequest.query.get(request_id)
-    if service_request:
-        service_request.status = 'closed'
+        # Commit the changes to the database
         db.session.commit()
-    return redirect(url_for('customer_dashboard'))
 
-@app.route('/customer/view_request/<int:request_id>')
-def view_service_request(request_id):
+        # Redirect to the profile page after updating
+        return redirect(url_for('customer_profile'))
+
+    # Render the profile page with customer data for GET request
+    return render_template('profile.html', customer=customer)
+
+@app.route('/submit_service_request', methods=['POST'])
+def submit_service_request():
+    service_professional_id = request.form['service_professional_id']
+    
+    # Set date_request to the current date and time
+    date_request = datetime.now()
+    
+    # Parse date_completion from the form, ensure it is a valid datetime object
+    date_completion_str = request.form['date_completion']
+    date_completion = datetime.strptime(date_completion_str, '%Y-%m-%dT%H:%M')  # Convert to datetime object
+    
+    status = 'requested'
+    rating = None
+    feedback = request.form['feedback']
+    
+    # Assuming you have the customer ID in the session
+    customer_id = session.get('user_id')  # Get customer ID
+    
+    # Get the service professional's service category to fetch the associated ServiceCategory
+    service_professional = ServiceProfessional.query.get(service_professional_id)
+    service_category_name = service_professional.service_category
+    
+    # Fetch the ServiceCategory using the service category name
+    service_category_obj = ServiceCategory.query.filter_by(name=service_category_name).first()
+    service_category_id = service_category_obj.id if service_category_obj else None  # Set to None if no category is found
+    
+    # Create the service request in the database
+    new_request = ServiceRequest(
+        customer_id=customer_id,
+        service_professional_id=service_professional_id,
+        service_category_id=service_category_id,
+        service_category=service_category_name,
+        date_request=date_request,
+        date_completion=date_completion,
+        status=status,
+        rating=rating,
+        feedback=feedback
+    )
+    
+    db.session.add(new_request)
+    db.session.commit()
+
+    # Redirect or show a confirmation message
+    flash('Service request submitted successfully!', 'success')
+    return redirect(url_for('customer_orders'))
+
+@app.route('/close_service_request/<int:request_id>', methods=['GET'])
+def close_service_request(request_id):
+    # Get the service request by its ID
     service_request = ServiceRequest.query.get(request_id)
-    return render_template('view_service_request.html', request=service_request)   
+    
+    if service_request:
+        try:
+            # Delete the service request from the database
+            db.session.delete(service_request)
+            db.session.commit()
+            flash('Service request closed successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while closing the service request. Please try again.', 'danger')
+    else:
+        flash('Service request not found.', 'danger')
+    
+    # Redirect to the customer orders page
+    return redirect(url_for('customer_orders'))
+
+@app.route('/edit_service_request/<int:request_id>', methods=['POST'])
+def edit_service_request(request_id):
+    service_request = ServiceRequest.query.get_or_404(request_id)
+    
+    # Convert date_completion from form input to datetime object
+    date_completion_str = request.form.get('date_completion')
+    if date_completion_str:
+        service_request.date_completion = datetime.strptime(date_completion_str, '%Y-%m-%dT%H:%M')
+    
+    # Update feedback
+    service_request.feedback = request.form.get('feedback')
+    
+    db.session.commit()
+    flash('Service request updated successfully', 'success')
+    return redirect(url_for('customer_orders'))
+
+
+
+@app.route('/submit_review/<int:request_id>', methods=['POST'])
+def submit_review(request_id):
+    # Get form data
+    rating = request.form.get('rating')
+    feedback = request.form.get('feedback')
+    
+    # Fetch the service request
+    service_request = ServiceRequest.query.get_or_404(request_id)
+
+    # Check if a review already exists for this request
+    review = Review.query.filter_by(ServiceRequest_id=request_id).first()
+    
+    if review:
+        # Update existing review
+        review.rating = rating
+        review.feedback = feedback
+        review.date_review = datetime.utcnow()
+    else:
+        # Create new review
+        review = Review(
+            customer_id=service_request.customer_id,
+            service_professional_id=service_request.service_professional_id,
+            ServiceRequest_id=request_id,
+            rating=rating,
+            feedback=feedback,
+            date_review=datetime.utcnow()
+        )
+        db.session.add(review)
+
+    # Update rating in ServiceRequest for convenience
+    #service_request.rating = rating
+    db.session.commit()
+
+    flash('Review has been successfully submitted!' if not review else 'Review has been updated!')
+    return redirect(url_for('customer_orders'))
+
 
 @app.route('/service_professional_dashboard')
 def service_professional_dashboard():
