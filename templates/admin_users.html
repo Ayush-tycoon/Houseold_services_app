@@ -3,7 +3,7 @@
 
 {% block content %}
 
-<div class="container">
+<div class="container mb-5">
     <div class="row">
         <div class="col-md-12">
             <h1 class="text-center">Manage Users</h1>
@@ -11,17 +11,30 @@
     </div>
 </div>
 
-
 <div class="container">
+    <h3 class="h3 text-center mb-5 mt-5">Customers</h3>
+    <div class="row mb-4">
+        <div class="col-12 col-md-8 offset-md-2">
+            <form class="d-flex flex-column flex-md-row align-items-center" action="{{ url_for('search_customer') }}" method="GET">
+                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="name1" placeholder="Search by Name" value="{{ name1 }}">
+                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="city1" placeholder="Search by City" value="{{ city1 }}">
+                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="phone1" placeholder="Search by Phone" value="{{ phone1 }}">
+                <button class="btn btn-primary mt-2 mt-md-0" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
 <!-- customer table -->
  <div class="row">
-    <h3 class="h3 text-center mt-5">Customers</h3>
     <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
 <table class='table table-bordered table-striped mt-4'>
     <thead class="thead-dark">
     <tr>
         <th scope="col">User_id</th>
         <th scope="col">Customer_id</th>
+        <th scope="col">Name</th>
         <th scope="col">Username</th>
         <th scope="col">Email</th>
         <th scope="col">Phone</th>
@@ -35,6 +48,7 @@
     <tr>
         <td>{{ user.id }}</td>
         <td>{{ user.customer_det.id }}</td>
+        <td>{{ user.customer_det.name }}</td>
         <td>{{ user.username }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.customer_det.phone }}</td>
@@ -115,17 +129,30 @@
 </div>
 </div>
 
+<div class="container">
+    <h3 class="h3 text-center mb-5 mt-5">Service Professionals</h3>
+    <div class="row mb-4">
+        <div class="col-12 col-md-8 offset-md-2">
+            <form class="d-flex flex-column flex-md-row align-items-center" action="{{ url_for('search_services_admin') }}" method="GET">
+                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="name" placeholder="Search by Name" value="{{ name }}">
+                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="city" placeholder="Search by City" value="{{ city }}">
+                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="category" placeholder="Search by Category" value="{{ category }}">
+                <input type="hidden" name="source" value="admin">
+                <button class="btn btn-primary mt-2 mt-md-0" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 <div class="row">
 <!-- Service Professionals Table -->
-<h3 class="h3 text-center mt-5">Service Professionals</h3>
 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
 <table class="table table-bordered table-striped mt-4">
     <tr>
         <th scope="col">User_id</th>
         <th scope="col">ServicePro_id</th>
         <th scope="col">Username</th>
-        <th scope="col">Email</th>
+        <th scope="col">Name</th>
         <th scope="col">Phone</th>
         <th scope="col">City</th>
         <th scope="col">Date Joined</th>
@@ -139,7 +166,7 @@
         <td>{{ user.id }}</td>
         <td>{{ user.service_professional_det.id }}</td>
         <td>{{ user.username }}</td>
-        <td>{{ user.email }}</td>
+        <td>{{ user.service_professional_det.name }}</td>
         <td>{{ user.service_professional_det.phone }}</td>
         <td>{{ user.service_professional_det.city }}</td>
         <td>{{ user.date_joined }}</td>
@@ -264,17 +291,17 @@
 </div>
 
 
-<div class="row">
+<div class="row mt-5 mb-3">
 <!-- Pending Requests Table -->
 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-<table class="table table-bordered table-striped mt-4">
-    <h3 class="h3 text-center mt-5">Pending Requests</h3>
+<table class="table table-bordered table-striped mt-5">
+    <h3 class="h3 text-center mt-5 mb-3">Pending Requests</h3>
     <tr>
         <th scope="col">Username</th>
         <th scope="col">Email</th>
         <th scope="col">Phone</th>
         <th scope="col">City</th>
-        <th scope="col">Date Joined</th>
+        <th scope="col">Date Applied</th>
         <th scope="col">Service Category</th>
         <th scope="col">Rate per hour</th>
         <th scope="col">Status</th>

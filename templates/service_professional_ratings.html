@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container mt-4" style="max-height:350px; overflow-y: auto;">
+        <h3>Ratings and Feedback for {{ service_professional.name }}</h2>
+        <h4>Average Rating: {{ service_professional.rating }}</h4>
+        <table class="table table-striped mt-5">
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Rating</th>
+                    <th>Feedback</th>
+                    <th>Review Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review, customer in reviews %}
+                    <tr>
+                        <td>{{ customer.name }}</td>
+                        <td>{{ review.rating }}</td>
+                        <td>{{ review.feedback or 'No feedback provided' }}</td>
+                        <td>{{ review.date_review.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

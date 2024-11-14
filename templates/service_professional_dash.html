@@ -1,12 +1,177 @@
+
 {% extends 'base.html' %}
 
 {% block content %}
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="text-center">Welcome to the Service Professional Dashboard</h1>
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="text-center">Welcome to the Service Professional Dashboard</h1>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container">
+    <h3 class="text-center">Service Requests</h3>
+    <div class="row pt-3" style="max-height:300px; overflow-y: auto;">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Service Category</th>
+                    <th>Status</th>
+                    <th>Request Date</th>
+                    <th>Completion Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in service_requests if request.status != 'completed' %}
+                <tr>
+                    <td>{{ request.customer.name }}</td>
+                    <td>{{ request.service_category }}</td>
+                    <td>{{ request.status }}</td>
+                    <td>{{ request.date_request }}</td>
+                    <td>{{ request.date_completion }}</td>
+                    <td>
+                        {% if request.status == 'requested' or request.status == 'denied' %}
+                        <!-- Accept Button -->
+                        <form action="{{ url_for('accept_request', request_id=request.id) }}" method="POST"
+                            style="display:inline;">
+                            <button type="submit" class="btn btn-success">Accept</button>
+                        </form>
+                        {%if request.status == 'requested'%}
+                        <!-- Decline Button -->
+                        <form action="{{ url_for('decline_request', request_id=request.id) }}" method="POST"
+                            style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Decline</button>
+                        </form>
+                        {%endif%}
+                        {%elif request.status == 'accepted'  %}
+                        <!-- Decline Button -->
+                        <form action="{{ url_for('decline_request', request_id=request.id) }}" method="POST"
+                            style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Decline</button>
+                        </form>
+                        {%endif%}
+                        <!-- Start Work Button -->
+                        <form action="{{ url_for('start_work', request_id=request.id) }}" method="POST"
+                            style="display:inline;">
+                            <button type="submit" class="btn btn-primary" {% if request.status != 'accepted' or
+                                request.date_completion.date() > current_datetime.date() %}disabled{% endif %}>Start Work</button>
+                        </form>
+                        <!-- Modal Trigger Button -->
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal"
+                            data-bs-target="#serviceRequestModal{{ request.id }}">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">No service requests available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+<!-- Modal for Viewing Service Request Details -->
+{% for request in service_requests %}
+<div class="modal fade" id="serviceRequestModal{{ request.id }}" tabindex="-1"
+    aria-labelledby="serviceRequestModalLabel{{ request.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serviceRequestModalLabel{{ request.id }}">Service Request Details: {{
+                    request.id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Customer Information</h6>
+                <p><strong>Name:</strong> {{ request.customer.name }}</p>
+                <p><strong>Phone:</strong> {{ request.customer.phone }}</p>
+                <p><strong>Address:</strong> {{ request.customer.address }}</p>
+
+                <h6>Service Details</h6>
+                <p><strong>Request id:</strong> {{ request.id }}</p>
+                <p><strong>Category:</strong> {{ request.service_category }}</p>
+                <p><strong>Status:</strong> {{ request.status }}</p>
+                <p><strong>Request Date:</strong> {{ request.date_request }}</p>
+                <p><strong>Date of Job:</strong> {{ request.date_completion }}</p>
+                <p><strong>Remarks:</strong> {{ request.feedback or "No feedback provided." }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
+</div>
+{% endfor %}
+<h3 class="text-center mt-5">Completed Service Requests</h3>
+<div class="row pt-3" style="max-height:300px; overflow-y: auto;">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Customer Name</th>
+                <th>Service Category</th>
+                <th>Status</th>
+                <th>Request Date</th>
+                <th>Completion Date</th>
+                <th>Rating</th>
+                <th>Feedback</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in service_requests if request.status == 'completed' %}
+            <tr>
+                <td>{{ request.customer.name }}</td>
+                <td>{{ request.service_category }}</td>
+                <td>{{ request.status }}</td>
+                <td>{{ request.date_request }}</td>
+                <td>{{ request.date_completion }}</td>
+                <td>
+                    {% set reviews = reviews_by_request_id.get(request.id, []) %}
+                    {% if reviews %}
+                        {% for review in reviews %}
+                            {{ review.rating }}<br>
+                        {% endfor %}
+                    {% else %}
+                        No reviews
+                    {% endif %}
+                </td>
+                <td>
+                    {% set reviews = reviews_by_request_id.get(request.id, []) %}
+                    {% if reviews %}
+                        {% for review in reviews %}
+                            {{ review.feedback }}<br>
+                        {% endfor %}
+                    {% else %}
+                        No reviews
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- Modal Trigger Button -->
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal"
+                        data-bs-target="#serviceRequestModal{{ request.id }}">
+                        View Details
+                    </button>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="text-center">No service requests available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+
+
 {% endblock %}

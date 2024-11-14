@@ -26,7 +26,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for request in service_requests if request.status != 'completed' %}
+                    {% for request in service_requests if (request.status == 'accepted' or request.status == 'requested' or request.status == 'in_progress') %}
                     <tr>
                         <td>{{ request.service_category }}</td>
                         <td>{{ request.service_professional.name }}</td>
@@ -44,13 +44,17 @@
                             <!-- View Button -->
                             <button type="button" class="btn btn-info btn-block" data-bs-toggle="modal"
                                 data-bs-target="#viewServiceRequestModal{{ request.id }}">View</button>
-                            {% if request.status != 'completed' %}
+                            {% if request.status != 'completed' and request.status != 'in_progress' %}
                             <!-- Close Button -->
                             <a href="{{ url_for('close_service_request', request_id=request.id) }}"
                                 class="btn btn-danger btn-block">Close</a>
                             <!-- Edit Button -->
                             <button type="button" class="btn btn-warning btn-block" data-bs-toggle="modal"
                                 data-bs-target="#editServiceRequestModal{{ request.id }}">Edit</button>
+                            {% elif request.status == 'in_progress' %}
+                            <!-- Complete Button -->
+                            <a href="{{ url_for('complete_service_request', request_id=request.id) }}"
+                                class="btn btn-success btn-block">Complete</a>
                             {% endif %}
                         </td>
                     </tr>
@@ -209,4 +213,50 @@
     {% endif %}
 {% endfor %}
 
+<!-- Not Completed/denied Service Requests Table Section -->
+<div class="row" style="max-height: 500px; overflow-y: auto;">
+    <div class="col-12">
+        <h4>Your Canceled Requests</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Service Category</th>
+                    <th>Service Professional</th>
+                    <th>Status</th>
+                    <th>Date of Request</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in service_requests if request.status == 'denied' %}
+                <tr>
+                    <td>{{ request.service_category }}</td>
+                    <td>{{ request.service_professional.name }}</td>
+                    <td>{{ request.status }}</td>
+                    <td>{{ request.date_request.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ request.service_professional.price_per_hour }}</td>
+                    <td>
+                        {% if request.review.rating %}
+                        {{ request.review.rating }} / 5
+                        {% else %}
+                        Not rated yet
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- View Button -->
+                        <button type="button" class="btn btn-info btn-block" data-bs-toggle="modal"
+                            data-bs-target="#viewServiceRequestModal{{ request.id }}">View</button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">No service requests found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

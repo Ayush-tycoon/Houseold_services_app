@@ -38,6 +38,17 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('customer_orders') }}">My Orders</a>
+        </li>
+        {% elif session['role'] == 'service_professional' %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('service_professional_dashboard') }}">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('service_professional_profile') }}">My Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('service_professional_ratings') }}">Ratings & Feedback</a>
+        </li>
         {%endif%}
         {% if session['role'] %}
         <li class="nav-item">
@@ -45,7 +56,11 @@
         </li>
         {% endif %}
       </ul>
-
+      {%if session['role']%}
+      <span class="navbar-text fs-5">
+        Hello {{session.get('name')}}
+      </span>
+      {%endif%}
     </div>
   </div>
 </nav>
