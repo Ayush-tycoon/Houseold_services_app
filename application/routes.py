@@ -19,6 +19,7 @@ from collections import defaultdict
 def home():
     return render_template('home.html')
 
+
 @app.route('/customer/dashboard')
 def customer_dashboard():
     user_id = session.get('user_id')  
@@ -33,6 +34,7 @@ def customer_dashboard():
     categories = ServiceCategory.query.filter_by(status='active').all()
 
     return render_template('customer_dash.html', customer=customer, service_requests=service_requests, categories=categories)
+
  
 @app.route('/customer/search_services', methods=['GET'])
 def search_services():
@@ -58,6 +60,7 @@ def search_services():
     serviceprofessionals = ServiceProfessional.query.filter(*query_filters).all()
 
     return render_template('customer_dash.html', services=serviceprofessionals, query=query, city=city, service_category=service_category, customer=customer, categories=categories)
+
 
 @app.route('/customer/search_services_admin', methods=['GET'])
 def search_services_admin():
@@ -90,6 +93,7 @@ def search_services_admin():
 
     return render_template('admin_users.html', pending_requests=pending_requests, ServiceProfessionals=serviceprofessionals, query=query, city=city, category=service_category, Customers=Customers)
 
+
 @app.route('/customer/orders')
 def customer_orders():
     user_id = session.get('user_id')
@@ -98,6 +102,7 @@ def customer_orders():
     for request in service_requests:
         request.review = Review.query.filter_by(ServiceRequest_id=request.id).first()
     return render_template('customer_orders.html', service_requests=service_requests)
+
 
 @app.route('/customer/profile')
 def customer_profile():
@@ -175,6 +180,45 @@ def submit_service_request():
     flash('Service request submitted successfully!', 'success')
     return redirect(url_for('customer_orders'))
 
+
+@app.route('/edit_service_request/<int:request_id>', methods=['POST'])
+def edit_service_request(request_id):
+    service_request = ServiceRequest.query.get_or_404(request_id)
+    
+    # Convert date_completion from form input to datetime object
+    date_completion_str = request.form.get('date_completion')
+    if date_completion_str:
+        service_request.date_completion = datetime.strptime(date_completion_str, '%Y-%m-%dT%H:%M')
+    
+    # Update feedback
+    service_request.feedback = request.form.get('feedback')
+    
+    db.session.commit()
+    flash('Service request updated successfully', 'success')
+    return redirect(url_for('customer_orders'))
+
+
+@app.route('/close_service_request/<int:request_id>', methods=['GET'])
+def close_service_request(request_id):
+    # Get the service request by its ID
+    service_request = ServiceRequest.query.get(request_id)
+    
+    if service_request:
+        try:
+            # Delete the service request from the database
+            db.session.delete(service_request)
+            db.session.commit()
+            flash('Service request closed successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while closing the service request. Please try again.', 'danger')
+    else:
+        flash('Service request not found.', 'danger')
+    
+    # Redirect to the customer orders page
+    return redirect(url_for('customer_orders'))
+
+
 @app.route('/service_professional_dashboard')
 def service_professional_dashboard():
     user_id = session.get('user_id')
@@ -201,6 +245,7 @@ def service_professional_dashboard():
         reviews_by_request_id[review.ServiceRequest_id].append(review)
 
     return render_template('service_professional_dash.html', service_requests=service_requests, current_date=current_date, current_datetime=current_datetime, reviews_by_request_id=reviews_by_request_id)
+
 
 @app.route('/service_professional/ratings', methods=['GET'])
 def service_professional_ratings():
@@ -229,6 +274,7 @@ def accept_request(request_id):
         flash('Invalid request or already processed.', 'danger')
     return redirect(url_for('service_professional_dashboard'))
 
+
 @app.route('/decline_request/<int:request_id>', methods=['POST'])
 def decline_request(request_id):
     service_request = ServiceRequest.query.get(request_id)
@@ -240,6 +286,7 @@ def decline_request(request_id):
         flash('Invalid request or already processed.', 'danger')
     return redirect(url_for('service_professional_dashboard'))
 
+
 @app.route('/start_work/<int:request_id>', methods=['POST'])
 def start_work(request_id):
     service_request = ServiceRequest.query.get(request_id)
@@ -250,6 +297,7 @@ def start_work(request_id):
     else:
         flash('Invalid request or cannot start work yet.', 'danger')
     return redirect(url_for('service_professional_dashboard'))
+
 
 @app.route('/complete_service_request/<int:request_id>', methods=['GET', 'POST'])
 def complete_service_request(request_id):
@@ -267,43 +315,6 @@ def complete_service_request(request_id):
         flash('Invalid request or the service request is not in progress.', 'danger')
     
     return redirect(url_for('customer_orders'))  # Redirect to the customer orders page
-
-@app.route('/close_service_request/<int:request_id>', methods=['GET'])
-def close_service_request(request_id):
-    # Get the service request by its ID
-    service_request = ServiceRequest.query.get(request_id)
-    
-    if service_request:
-        try:
-            # Delete the service request from the database
-            db.session.delete(service_request)
-            db.session.commit()
-            flash('Service request closed successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash('An error occurred while closing the service request. Please try again.', 'danger')
-    else:
-        flash('Service request not found.', 'danger')
-    
-    # Redirect to the customer orders page
-    return redirect(url_for('customer_orders'))
-
-
-@app.route('/edit_service_request/<int:request_id>', methods=['POST'])
-def edit_service_request(request_id):
-    service_request = ServiceRequest.query.get_or_404(request_id)
-    
-    # Convert date_completion from form input to datetime object
-    date_completion_str = request.form.get('date_completion')
-    if date_completion_str:
-        service_request.date_completion = datetime.strptime(date_completion_str, '%Y-%m-%dT%H:%M')
-    
-    # Update feedback
-    service_request.feedback = request.form.get('feedback')
-    
-    db.session.commit()
-    flash('Service request updated successfully', 'success')
-    return redirect(url_for('customer_orders'))
 
 
 @app.route('/submit_review/<int:request_id>', methods=['POST'])
@@ -348,6 +359,7 @@ def service_professional_profile():
     user_id = session.get('user_id')
     service_professional = ServiceProfessional.query.filter_by(user_id=user_id).first()
     return render_template('service_professional_profile.html', service_professional=service_professional)
+
 
 @app.route('/edit_servicepro_profile', methods=['POST'])
 def edit_servicepro_profile():
@@ -598,10 +610,12 @@ def manageusers():
     
     return render_template('admin_users.html', Customers=Customers, ServiceProfessionals=ServiceProfessionals, pending_requests=pending_requests, service_categories=service_categories)
 
+
 @app.route('/baseprice')
 def baseprice():
     service_categories = ServiceCategory.query.all()
     return render_template('baseprices.html', service_categories=service_categories)
+
 
 @app.route('/managecategories')
 def managecategories():
@@ -626,6 +640,7 @@ def addcategory():
         flash('Category added successfully')
         return redirect(url_for('managecategories'))
 
+
 @app.route('/delcategory/<int:id>')
 def deletecategory(id):
     service_category = ServiceCategory.query.get(id)
@@ -636,6 +651,7 @@ def deletecategory(id):
         db.session.commit()
         flash('Category deleted')
         return redirect(url_for('managecategories'))
+
     
 @app.route('/actcategory/<int:id>')
 def activecategory(id):
@@ -647,6 +663,7 @@ def activecategory(id):
         db.session.commit()
         flash('Category Activated')
         return redirect(url_for('managecategories'))   
+
     
 @app.route('/editcategory/<int:id>', methods=['POST'])
 def editcategory(id):
@@ -786,6 +803,7 @@ def approve(id):
         db.session.commit()
         flash('User approved')
         return redirect(url_for('manageusers'))
+
     
 @app.route('/delete/<int:id>')
 def delete(id):
@@ -801,6 +819,7 @@ def delete(id):
         db.session.commit()
         flash('User deleted')
         return redirect(url_for('manageusers'))
+
     
 @app.route('/activate/<int:id>')
 def active(id):
@@ -812,6 +831,7 @@ def active(id):
     db.session.commit()
     flash('User activated')
     return redirect(url_for('manageusers'))
+
     
 @app.route('/inactive/<int:id>')
 def inactive(id):
@@ -837,6 +857,7 @@ def blacklist(id):
     db.session.commit()
     flash('User blacklisted')
     return redirect(url_for('manageusers'))
+
 
 @app.route('/edit_service_pro/<int:id>', methods=['GET', 'POST'])
 def edit_service_pro(id):
@@ -881,6 +902,7 @@ def edit_service_pro(id):
         flash('Service Professional updated successfully!', 'success')
 
         return redirect(url_for('manageusers'))  
+
 
 @app.route('/editcust/<int:id>', methods=['GET', 'POST'])
 def editcustomer(id):
