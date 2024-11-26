@@ -19,16 +19,16 @@
     <tbody>
       {% for category in service_categories %}
       <tr>
-        <td scope="row">{{category.name}}</td>
-        <td scope="row">{{category.base_price}}</td>
-        <td scope="row">{{category.time_required}}</td>
-        <td scope="row">{{category.description}}</td>
-        <td scope="row">{{category.status}}</td>
+        <td scope="row">{{ category.name }}</td>
+        <td scope="row">{{ category.base_price }}</td>
+        <td scope="row">{{ category.time_required }}</td>
+        <td scope="row">{{ category.description }}</td>
+        <td scope="row">{{ category.status }}</td>
         <td scope="row">
           {% if category.status == 'active' %}
-          <a href="{{url_for('deletecategory', id=category.id)}}" class="btn btn-danger">Inactive</a>
+          <a href="{{ url_for('deletecategory', id=category.id) }}" class="btn btn-danger">Inactive</a>
           {% else %}
-          <a href="{{url_for('activecategory', id=category.id)}}" class="btn btn-success">Active</a>
+          <a href="{{ url_for('activecategory', id=category.id) }}" class="btn btn-success">Active</a>
           {% endif %}
           {% if category.status == 'active' %}
           <!-- Button trigger modal for editing -->
@@ -44,23 +44,31 @@
                   <h5 class="modal-title" id="editModalLabel{{ category.id }}">Edit Category</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ url_for('editcategory', id=category.id) }}">
+                <form method="POST" action="{{ url_for('editcategory', id=category.id) }}" novalidate>
                   <div class="modal-body">
                     <div class="mb-3">
                       <label for="name{{ category.id }}" class="form-label">Category Name</label>
-                      <input type="text" class="form-control" id="name{{ category.id }}" name="name" value="{{ category.name }}" required>
+                      <input type="text" class="form-control" id="name{{ category.id }}" name="name" value="{{ category.name }}" 
+                             required pattern="^[a-zA-Z\s]{3,50}$" 
+                             title="Category name must be 3-50 characters long and only contain letters and spaces.">
                     </div>
                     <div class="mb-3">
                       <label for="base_price{{ category.id }}" class="form-label">Base Price</label>
-                      <input type="number" class="form-control" id="base_price{{ category.id }}" name="base_price" value="{{ category.base_price }}" required>
+                      <input type="number" class="form-control" id="base_price{{ category.id }}" name="base_price" value="{{ category.base_price }}" 
+                             required min="1" max="100000" 
+                             title="Base price must be between 1 and 100,000.">
                     </div>
                     <div class="mb-3">
                       <label for="time_required{{ category.id }}" class="form-label">Time Required (in minutes)</label>
-                      <input type="number" class="form-control" id="time_required{{ category.id }}" name="time_required" value="{{ category.time_required }}" required>
+                      <input type="number" class="form-control" id="time_required{{ category.id }}" name="time_required" value="{{ category.time_required }}" 
+                             required min="1" max="1440" 
+                             title="Time must be between 1 and 1440 minutes.">
                     </div>
                     <div class="mb-3">
                       <label for="description{{ category.id }}" class="form-label">Description</label>
-                      <textarea class="form-control" id="description{{ category.id }}" name="description" required>{{ category.description }}</textarea>
+                      <textarea class="form-control" id="description{{ category.id }}" name="description" rows="4" required 
+                                minlength="10" maxlength="500" 
+                                title="Description must be between 10 and 500 characters.">{{ category.description }}</textarea>
                     </div>
                   </div>
                   <div class="modal-footer">

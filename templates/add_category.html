@@ -7,34 +7,66 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <h2 class="text-center mb-4">Add New Service Category</h2>
-            <form action="{{url_for('addcategory')}}" method="POST">
+            <form action="{{ url_for('addcategory') }}" method="POST" novalidate>
                 
                 <!-- Category Name -->
                 <div class="form-group mb-3">
                     <label for="name">Category Name</label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter category name" required>
-                    <div class="invalid-feedback">Please enter a category name.</div>
+                    <input type="text" 
+                           class="form-control" 
+                           id="name" 
+                           name="name" 
+                           placeholder="Enter category name" 
+                           required 
+                           pattern="^[a-zA-Z\s]{3,50}$"
+                           title="Category name must be 3-50 characters long and only contain letters and spaces.">
+                    <div class="invalid-feedback">Please enter a valid category name (3-50 letters).</div>
                 </div>
 
                 <!-- Base Price -->
                 <div class="form-group mb-3">
                     <label for="base_price">Base Price (in Rs)</label>
-                    <input type="number" step="0.01" class="form-control" id="base_price" name="base_price" placeholder="Enter base price" required>
-                    <div class="invalid-feedback">Please enter a valid base price.</div>
+                    <input type="number" 
+                           step="0.01" 
+                           class="form-control" 
+                           id="base_price" 
+                           name="base_price" 
+                           placeholder="Enter base price" 
+                           required 
+                           min="1"
+                           max="100000"
+                           title="Base price must be between 1 and 100,000.">
+                    <div class="invalid-feedback">Please enter a valid base price (1-100,000 Rs).</div>
                 </div>
 
                 <!-- Time Required -->
                 <div class="form-group mb-3">
                     <label for="time_required">Time Required (in minutes)</label>
-                    <input type="number" class="form-control" id="time_required" name="time_required" placeholder="Enter time required in minutes" required>
-                    <div class="invalid-feedback">Please enter the required time in minutes.</div>
+                    <input type="number" 
+                           class="form-control" 
+                           id="time_required" 
+                           name="time_required" 
+                           placeholder="Enter time required in minutes" 
+                           required 
+                           min="1"
+                           max="1440"
+                           title="Time must be between 1 and 1440 minutes (24 hours).">
+                    <div class="invalid-feedback">Please enter the required time in minutes (1-1440).</div>
                 </div>
 
                 <!-- Description -->
                 <div class="form-group mb-3">
                     <label for="description">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter category description" required></textarea>
-                    <div class="invalid-feedback">Please provide a description.</div>
+                    <textarea class="form-control" 
+                              id="description" 
+                              name="description" 
+                              rows="4" 
+                              placeholder="Enter category description" 
+                              required 
+                              minlength="10" 
+                              maxlength="500"
+                              title="Description must be between 10 and 500 characters."></textarea>
+                    <div class="invalid-feedback">Please provide a description (10-500 characters).</div>
                 </div>
 
                 <!-- Submit Button -->
@@ -51,4 +83,3 @@
     <p>You do not have permission to access this page</p>
     <a href="{{ url_for('home') }}">Go back to home</a>
 {% endif %}
-

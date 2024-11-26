@@ -16,14 +16,39 @@
     <div class="row mb-4">
         <div class="col-12 col-md-8 offset-md-2">
             <form class="d-flex flex-column flex-md-row align-items-center" action="{{ url_for('search_customer') }}" method="GET">
-                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="name1" placeholder="Search by Name" value="{{ name1 }}">
-                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="city1" placeholder="Search by City" value="{{ city1 }}">
-                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="phone1" placeholder="Search by Phone" value="{{ phone1 }}">
+                <input 
+                    type="text" 
+                    class="form-control mb-2 mb-md-0 me-md-2" 
+                    name="name1" 
+                    placeholder="Search by Name" 
+                    value="{{ name1 }}" 
+                    pattern="[A-Za-z\s]+" 
+                    title="Name should only contain letters and spaces."
+                >
+                <input 
+                    type="text" 
+                    class="form-control mb-2 mb-md-0 me-md-2" 
+                    name="city1" 
+                    placeholder="Search by City" 
+                    value="{{ city1 }}" 
+                    pattern="[A-Za-z\s]+" 
+                    title="City should only contain letters and spaces."
+                >
+                <input 
+                    type="tel" 
+                    class="form-control mb-2 mb-md-0 me-md-2" 
+                    name="phone1" 
+                    placeholder="Search by Phone" 
+                    value="{{ phone1 }}" 
+                    pattern="^\d{10}$" 
+                    title="Phone number should be exactly 10 digits."
+                >
                 <button class="btn btn-primary mt-2 mt-md-0" type="submit">Search</button>
             </form>
         </div>
     </div>
 </div>
+
 
 <div class="container mb-5">
 <!-- customer table -->
@@ -76,7 +101,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{ url_for('editcustomer', id=user.id) }}" method="POST" novalidate>
+                            <form class='needs-validation' action="{{ url_for('editcustomer', id=user.id) }}" method="POST" novalidate>
                                 <div class="form-group mb-3">
                                     <label for="username">Username</label>
                                     <input type="text" class="form-control" id="username" name="username" value="{{user.username}}" required>
@@ -115,9 +140,6 @@
                 
                                 <button type="submit" class="btn btn-primary ">Save Changes</button>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger btn-block">Close</button>
                         </div>
                     </div>
                 </div>
@@ -196,7 +218,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{ url_for('edit_service_pro', id=user.id) }}" method="POST" novalidate>
+                            <form class='needs-validation' action="{{ url_for('edit_service_pro', id=user.id) }}" method="POST" novalidate>
 
                                 <div class="form-group mb-3">
                                     <label for="username">Username</label>
@@ -276,9 +298,6 @@
 
                                 <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger btn-block" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>

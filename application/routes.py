@@ -11,7 +11,7 @@ import base64
 from datetime import datetime
 from flask import request, redirect, url_for, flash
 from collections import defaultdict
-
+import re
 
 
 
@@ -411,6 +411,19 @@ def search_customer():
     name = request.args.get('name1', '').strip()
     city = request.args.get('city1', '').strip()
     phone = request.args.get('phone1', '').strip()
+    #flash("hi")
+    # Validate inputs
+    if name and (not name.isalpha()):
+        flash("Name should only contain letters and spaces.", "light")
+        return redirect(url_for('search_customer'))
+    if city and not city.isalpha():
+        flash("City should only contain letters and spaces.", "light")
+        return redirect(url_for('search_customer'))
+    if phone and (not phone.isdigit() or len(phone) != 10):
+        flash("Phone number should be exactly 10 digits.", "light")
+        return redirect(url_for('search_customer'))
+
+    # Query service professionals for pending and approved statuses
     ServiceProfessionals = User.query.join(ServiceProfessional).filter(
         (User.role == 'service_professional') & 
         (ServiceProfessional.status.in_(['approved', 'blacklisted']))
@@ -420,11 +433,10 @@ def search_customer():
         (ServiceProfessional.status == 'pending')
     ).all()
 
-    # Start with the base query
-    #query = db.session.query(Customer)
+    # Base query for customers
     query = User.query.join(Customer).filter(User.role == 'customer')
-    
-    # Add filters based on search criteria
+
+    # Add filters based on validated search criteria
     if name:
         query = query.filter(Customer.name.like(f"%{name}%"))
     if city:
@@ -432,8 +444,14 @@ def search_customer():
     if phone:
         query = query.filter(Customer.phone.like(f"%{phone}%"))
 
-    # Execute the query to get the filtered results
+    # Execute the query to get filtered results
     filtered_customers = query.all()
+
+    # Provide appropriate feedback
+    if not filtered_customers:
+        flash("No customers found matching the search criteria.", "light")
+    else:
+        flash(f"Found {len(filtered_customers)} customers.", "light")
 
     # Render the template with the filtered results
     return render_template(
@@ -442,7 +460,8 @@ def search_customer():
         name1=name,
         city1=city,
         phone1=phone,
-        pending_requests=pending_requests, ServiceProfessionals=ServiceProfessionals
+        pending_requests=pending_requests,
+        ServiceProfessionals=ServiceProfessionals
     )
     
 
@@ -628,16 +647,38 @@ def addcategory():
     if request.method == 'GET':
         return render_template('add_category.html')
     elif request.method == 'POST':
-        name = request.form.get('name')
-        base_price = float(request.form.get('base_price'))
-        time_required = int(request.form.get('time_required'))
-        description = request.form.get('description')
-        status = 'active'
+        name = request.form.get('name', '').strip()
+        base_price = request.form.get('base_price', '').strip()
+        time_required = request.form.get('time_required', '').strip()
+        description = request.form.get('description', '').strip()
 
-        service_category = ServiceCategory(name=name, base_price=base_price, time_required=time_required, description=description, status=status)
+        # Server-side validation
+        errors = []
+        if not name or not (3 <= len(name) <= 50) or not name.replace(' ', '').isalpha():
+            errors.append("Category name must be 3-50 letters long and contain letters only.")
+        if not base_price or not base_price.isnumeric() or not (1 <= float(base_price) <= 100000):
+            errors.append("Base price must be a number between 1 and 100,000.")
+        if not time_required or not time_required.isnumeric() or not (1 <= int(time_required) <= 1440):
+            errors.append("Time required must be a number between 1 and 1440 minutes.")
+        if not description or not (10 <= len(description) <= 500):
+            errors.append("Description must be between 10 and 500 characters.")
+
+        if errors:
+            for error in errors:
+                flash(error, 'danger')
+            return redirect(url_for('addcategory'))
+
+        # Add to database
+        service_category = ServiceCategory(
+            name=name, 
+            base_price=float(base_price), 
+            time_required=int(time_required), 
+            description=description, 
+            status='active'
+        )
         db.session.add(service_category)
         db.session.commit()
-        flash('Category added successfully')
+        flash('Category added successfully', 'success')
         return redirect(url_for('managecategories'))
 
 
@@ -668,21 +709,47 @@ def activecategory(id):
 @app.route('/editcategory/<int:id>', methods=['POST'])
 def editcategory(id):
     category = ServiceCategory.query.get_or_404(id)
-    if request.method == 'POST' and category.status == 'active':
-        category.name = request.form['name']
-        category.base_price = request.form['base_price']
-        category.time_required = request.form['time_required']
-        category.description = request.form['description']
-        category.status = 'active'
-        
-        try:
-            db.session.commit()
-            flash('Category updated successfully!', 'success')
-        except:
-            db.session.rollback()
-            flash('Error updating category. Please try again.', 'danger')
-        
-    return redirect(url_for('managecategories')) 
+
+    if category.status != 'active':
+        flash('Category must be active to edit.', 'danger')
+        return redirect(url_for('managecategories'))
+
+    # Get form data
+    name = request.form.get('name', '').strip()
+    base_price = request.form.get('base_price', '').strip()
+    time_required = request.form.get('time_required', '').strip()
+    description = request.form.get('description', '').strip()
+
+    # Validate inputs
+    errors = []
+    if not name or not (3 <= len(name) <= 50) or not name.replace(' ', '').isalpha():
+        errors.append("Category name must be 3-50 letters long and contain only letters.")
+    if not base_price or not base_price.isnumeric() or not (1 <= float(base_price) <= 100000):
+        errors.append("Base price must be a number between 1 and 100,000.")
+    if not time_required or not time_required.isnumeric() or not (1 <= int(time_required) <= 1440):
+        errors.append("Time required must be a number between 1 and 1440 minutes.")
+    if not description or not (10 <= len(description) <= 500):
+        errors.append("Description must be between 10 and 500 characters.")
+
+    # Handle errors
+    if errors:
+        for error in errors:
+            flash(error, 'danger')
+        return redirect(url_for('managecategories'))
+
+    # Update category
+    try:
+        category.name = name
+        category.base_price = float(base_price)
+        category.time_required = int(time_required)
+        category.description = description
+        db.session.commit()
+        flash('Category updated successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error updating category. Please try again.', 'danger')
+
+    return redirect(url_for('managecategories'))
 
 
 @app.route('/Login', methods=['GET', 'POST'])
@@ -861,14 +928,19 @@ def blacklist(id):
 
 @app.route('/edit_service_pro/<int:id>', methods=['GET', 'POST'])
 def edit_service_pro(id):
-    
+    # Retrieve the user by ID
     user = User.query.get(id)
     if not user:
-        flash('User not found')
+        flash('User not found', 'error')
+        return redirect(url_for('manageusers'))
+
     service_pro = user.service_professional_det
+    if not service_pro:
+        flash('Service Professional details not found', 'error')
+        return redirect(url_for('manageusers'))
 
     if request.method == 'POST':
-        
+        # Get form data
         username = request.form.get('username')
         name = request.form.get('name')
         email = request.form.get('email')
@@ -880,14 +952,44 @@ def edit_service_pro(id):
         price_per_hour = request.form.get('price_per_hour')
         expenses_per_hour = request.form.get('expenses_per_hour')
 
-        if not username or not name or not email or not phone or not city or not service_category or not experience or not company_name or not price_per_hour:
-            flash('Please fill all the fields')
-            return redirect(url_for('manageusers', id=id))
-        
+        # Validate input fields
+        errors = []
+        if not username or len(username) < 3:
+            errors.append('Username must be at least 3 characters long.')
+        if not name or len(name) < 2 and not name.isalpha():
+            errors.append('Name must be at least 2 characters long and contain only letters.')
+        if not email or not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            errors.append('Invalid email address.')
+        if not phone or not re.match(r"^\d{10}$", phone):
+            errors.append('Phone number must be exactly 10 digits.')
+        if not city or len(city) < 2:
+            errors.append('City name must be at least 2 characters long.')
+        if not service_category:
+            errors.append('Service category is required.')
+        if not experience or not experience.isdigit() or int(experience) < 0:
+            errors.append('Experience must be a positive integer.')
+        if not company_name or len(company_name) < 2:
+            errors.append('Company name must be at least 2 characters long.')
+        try:
+            if not price_per_hour or float(price_per_hour) <= 0:
+                errors.append('Price per hour must be a positive number.')
+        except ValueError:
+            errors.append('Price per hour must be a valid number.')
+        try:
+            if expenses_per_hour and float(expenses_per_hour) < 0:
+                errors.append('Expenses per hour must not be negative.')
+        except ValueError:
+            errors.append('Expenses per hour must be a valid number.')
+
+        # If there are errors, flash them and redirect to the edit page
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return redirect(url_for('edit_service_pro', id=id))
+
+        # Update user and service professional details
         user.username = username
         user.email = email
-
-        
         service_pro.name = name
         service_pro.phone = phone
         service_pro.city = city
@@ -895,23 +997,38 @@ def edit_service_pro(id):
         service_pro.experience = int(experience)
         service_pro.company_name = company_name
         service_pro.price_per_hour = float(price_per_hour)
-        service_pro.expenses_per_hour = int(float(expenses_per_hour)) if expenses_per_hour else 0
+        service_pro.expenses_per_hour = float(expenses_per_hour) if expenses_per_hour else 0
 
-        
-        db.session.commit()
-        flash('Service Professional updated successfully!', 'success')
+        # Save changes to the database
+        try:
+            db.session.commit()
+            flash('Service Professional updated successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating Service Professional: {str(e)}', 'error')
 
-        return redirect(url_for('manageusers'))  
+        return redirect(url_for('manageusers'))
+
+    # Render the edit form with current user and service professional details
+    return redirect(url_for('manageusers'))
+
 
 
 @app.route('/editcust/<int:id>', methods=['GET', 'POST'])
 def editcustomer(id):
+    # Retrieve the user by ID
     user = User.query.get(id)
     if not user:
-        flash('User not found')
+        flash('User not found', 'error')
+        return redirect(url_for('manageusers'))
 
     customer = user.customer_det
+    if not customer:
+        flash('Customer details not found', 'error')
+        return redirect(url_for('manageusers'))
+
     if request.method == 'POST':
+        # Get form data
         username = request.form.get('username')
         name = request.form.get('name')
         email = request.form.get('email')
@@ -919,22 +1036,47 @@ def editcustomer(id):
         city = request.form.get('city')
         address = request.form.get('address')
 
-        if not username or not name or not email or not phone or not city or not address:
-            flash('Please fill all the fields')
-            return redirect(url_for('manageusers', id=id))
-        
+        # Validation
+        errors = []
+        if not username or len(username) < 3 and not name.isalpha():
+            errors.append('Username must be at least 3 characters long.')
+        if not name or len(name) < 2:
+            errors.append('Name must be at least 2 characters long.')
+        if not email or not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            errors.append('Invalid email address.')
+        if not phone or not re.match(r"^\d{10}$", phone):
+            errors.append('Phone number must be exactly 10 digits.')
+        if not city or len(city) < 2:
+            errors.append('City name must be at least 2 characters long.')
+        if not address or len(address) < 5:
+            errors.append('Address must be at least 5 characters long.')
+
+        # If errors exist, flash them and redirect back to the form
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return redirect(url_for('editcustomer', id=id))
+
+        # Update user and customer details
         user.username = username
         user.email = email
-
         customer.name = name
         customer.phone = phone
         customer.city = city
         customer.address = address
 
-        db.session.commit()
-        flash('Customer updated successfully!')
+        # Commit changes to the database
+        try:
+            db.session.commit()
+            flash('Customer updated successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating customer: {str(e)}', 'error')
 
         return redirect(url_for('manageusers'))
+
+    # Render the edit form with current user details
+    return render_template('editcustomer.html', user=user, customer=customer)
 
 
 
