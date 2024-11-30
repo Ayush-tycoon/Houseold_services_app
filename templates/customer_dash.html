@@ -12,21 +12,47 @@
     <!-- Search Bar Section -->
     <div class="row mb-4">
         <div class="col-12 col-md-8 offset-md-2">
-            <form class="d-flex flex-column flex-md-row align-items-center" action="{{ url_for('search_services') }}" method="GET">
-                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="query" placeholder="Search by Name" value="{{ query }}">
-                <input type="text" class="form-control mb-2 mb-md-0 me-md-2" name="city" placeholder="Search by City" value="{{ city }}">
-                <select class="form-select" name="service_category" aria-label="Search by Service Category">
-                    <option value="">Search by Service Category</option>
+            <form class="d-flex flex-column flex-md-row align-items-center" action="{{ url_for('search_services') }}" method="GET" novalidate>
+                <!-- Name Input -->
+                <input type="text" 
+                       class="form-control mb-2 mb-md-0 me-md-2" 
+                       name="query" 
+                       placeholder="Search by Name" 
+                       value="{{ query }}" 
+                       maxlength="50"
+                       pattern="^[a-zA-Z\s]+$" 
+                       title="Name should only contain alphabets and spaces.">
+                
+                <!-- City Input -->
+                <input type="text" 
+                       class="form-control mb-2 mb-md-0 me-md-2" 
+                       name="city" 
+                       placeholder="Search by City" 
+                       value="{{ city }}" 
+                       maxlength="50"
+                       pattern="^[a-zA-Z\s]+$" 
+                       title="City should only contain alphabets and spaces.">
+                
+                <!-- Service Category Dropdown -->
+                <select class="form-select" 
+                        name="service_category" 
+                        aria-label="Search by Service Category" 
+                        required>
+                    <option value="" disabled {% if not service_category %}selected{% endif %}>Select a Service Category</option>
                     {% for cat in categories %}
                         <option value="{{ cat.name }}" {% if cat.name == service_category %}selected{% endif %}>{{ cat.name }}</option>
                     {% endfor %}
                 </select>
-
+    
+                <!-- Hidden Source Input -->
                 <input type="hidden" name="source" value="customer">
+    
+                <!-- Submit Button -->
                 <button class="btn btn-primary mt-2 mt-md-0" type="submit">Search</button>
             </form>
         </div>
     </div>
+    
 
     <!-- Service Professionals Search Results -->
     {% if services %}

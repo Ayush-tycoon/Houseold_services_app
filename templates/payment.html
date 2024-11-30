@@ -1,0 +1,46 @@
+{%if session['role']=='customer' and customer.user_id==session['user_id'] and service_request.status != 'payed'%}
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="card shadow-lg">
+          <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Payment Portal</h2>
+          </div>
+          <div class="card-body">
+            <h3 class="mb-4">Service Request Details</h3>
+            
+            <div class="list-group">
+              <p class="list-group-item"><strong>Customer:</strong> {{ customer.name }}</p>
+              <p class="list-group-item"><strong>Service Professional:</strong> {{ service_professional.name }}</p>
+              <p class="list-group-item"><strong>Service Category:</strong> {{ category.name if category else 'N/A' }}</p>
+              <p class="list-group-item"><strong>Service Start Date/Time:</strong> {{ service_request.date_request }}</p>
+              <p class="list-group-item"><strong>Completion Date/Time:</strong> {{ service_request.date_completion }}</p>
+              <p class="list-group-item"><strong>Status:</strong> {{ service_request.status }}</p>
+              <p class="list-group-item"><strong>Rating:</strong> {% if service_request.rating %}{{ service_request.rating }}{% else %}Not rated yet{% endif %}</p>
+              <p class="list-group-item"><strong>Feedback:</strong> {% if service_request.feedback %}{{ service_request.feedback }}{% else %}No feedback yet{% endif %}</p>
+            </div>
+
+            <hr>
+
+            <h4 class="mb-3">Total Payment</h4>
+            <div class="alert alert-info">
+              <p><strong>Amount Due: </strong>{{((service_request.date_request - service_request.date_completion).total_seconds() / 3600) * service_professional.price_per_hour | round(2)}}</p>
+            </div>
+
+            <form action="{{ url_for('payment_success', service_request_id=service_request.id) }}" method="POST">
+              <button type="submit" class="btn btn-success btn-lg btn-block">Proceed to Payment</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{%else%}
+You are not authorized to view this page.
+{%endif%}
+
+

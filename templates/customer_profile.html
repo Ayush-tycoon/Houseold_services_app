@@ -18,6 +18,9 @@
                         <p><strong>Phone:</strong> {{ customer.phone }}</p>
                     </div>
                     <div class="col-12 mb-3">
+                        <p><strong>Email:</strong> {{ customer.user.email }}</p>
+                    </div>
+                    <div class="col-12 mb-3">
                         <p><strong>City:</strong> {{ customer.city }}</p>
                     </div>
                     <div class="col-12 mb-3">
@@ -47,30 +50,44 @@
                 <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{{ url_for('edit_customer') }}">
+            <form method="POST" class='needs-validation' action="{{ url_for('editcustomer', id=customer.user_id) }}" novalidate>
                 <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{customer.user.username}}" required>
+                        <div class="invalid-feedback">Username is required.</div>
+                    </div>
                     <!-- Name -->
                     <div class="form-group mb-3">
                         <label for="name">Name</label>
                         <input type="text" class="form-control" id="name" name="name" value="{{ customer.name }}" required>
+                        <div class="invalid-feedback">Name is required</div>
                     </div>
 
                     <!-- Phone -->
                     <div class="form-group mb-3">
                         <label for="phone">Phone</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="{{ customer.phone }}" required>
+                        <input type="tel" pattern="\d{10}" 
+                        maxlength="10" class="form-control" id="phone" name="phone" value="{{ customer.phone }}" required>
+                        <div class="invalid-feedback">10 digit Phone is required</div>
                     </div>
-
+                    <div class="form-group mb-3">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{customer.user.email}}" required>
+                        <div class="invalid-feedback">Valid email is required.</div>
+                    </div>
                     <!-- City -->
                     <div class="form-group mb-3">
                         <label for="city">City</label>
                         <input type="text" class="form-control" id="city" name="city" value="{{ customer.city }}" required>
+                        <div class="invalid-feedback">City is required</div>
                     </div>
 
                     <!-- Address -->
                     <div class="form-group mb-3">
                         <label for="address">Address</label>
                         <textarea class="form-control" id="address" name="address" rows="3" required>{{ customer.address }}</textarea>
+                        <div class="invalid-feedback">Address is required</div>
                     </div>
                 </div>
                 <div class="modal-footer">

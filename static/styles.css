@@ -1,0 +1,16 @@
+/* <uniquifier>: Use a unique and descriptive class name */
+/* <weight>: Use a value from 300 to 800 in increments of 50 */
+
+.funnel-display-medium {
+  font-family: "Funnel Display", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 450;
+  font-style: normal;
+}
+
+body {
+    font-family: "Funnel Display", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 450;
+    font-style: normal;
+}

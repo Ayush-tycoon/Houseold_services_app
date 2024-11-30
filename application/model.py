@@ -1,6 +1,7 @@
 from application.database import db
+from flask_login import UserMixin
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -11,6 +12,22 @@ class User(db.Model):
     # One-to-One relationship with Customer and ServiceProfessional
     customer_det = db.relationship('Customer', backref='user', lazy=True, uselist=False)
     service_professional_det = db.relationship('ServiceProfessional', backref='user', lazy=True, uselist=False)
+    
+    @property
+    def is_active(self):
+        # For a 'customer' role, check the `status` in the `Customer` model
+        if self.role == 'customer':
+            return self.customer_det.status == 'active'
+        # For a 'service_professional' role, check the `status` in the `ServiceProfessional` model
+        elif self.role == 'service_professional':
+            return self.service_professional_det.status == 'approved'
+        
+        elif self.role == 'admin':
+            return True
+        return False  # For any other role, return False or handle accordingly
+    
+    def get_id(self):
+        return str(self.id)
 
 class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -26,7 +26,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for request in service_requests if (request.status == 'accepted' or request.status == 'requested' or request.status == 'in_progress') %}
+                    {% for request in service_requests if (request.status == 'accepted' or request.status == 'requested' or request.status == 'in_progress' or request.status == 'payed') %}
                     <tr>
                         <td>{{ request.service_category }}</td>
                         <td>{{ request.service_professional.name }}</td>
@@ -44,7 +44,7 @@
                             <!-- View Button -->
                             <button type="button" class="btn btn-info btn-block" data-bs-toggle="modal"
                                 data-bs-target="#viewServiceRequestModal{{ request.id }}">View</button>
-                            {% if request.status != 'completed' and request.status != 'in_progress' %}
+                            {% if request.status != 'completed' and request.status != 'in_progress' and request.status!='payed' %}
                             <!-- Close Button -->
                             <a href="{{ url_for('close_service_request', request_id=request.id) }}"
                                 class="btn btn-danger btn-block">Close</a>
@@ -53,6 +53,9 @@
                                 data-bs-target="#editServiceRequestModal{{ request.id }}">Edit</button>
                             {% elif request.status == 'in_progress' %}
                             <!-- Complete Button -->
+                            <a href="{{ url_for('payment', service_request_id=request.id) }}"
+                                class="btn btn-success btn-block">Pay</a>
+                            {%elif request.status == 'payed'%}
                             <a href="{{ url_for('complete_service_request', request_id=request.id) }}"
                                 class="btn btn-success btn-block">Complete</a>
                             {% endif %}

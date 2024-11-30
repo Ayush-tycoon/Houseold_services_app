@@ -62,7 +62,7 @@
                 <h5 class="modal-title" id="editCustomerModalLabel">Edit Your Profile</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{{ url_for('edit_servicepro_profile') }}">
+            <form method="POST" class = 'needs-validation 'action="{{ url_for('edit_servicepro_profile') }}" novalidate>
                 <div class="modal-body">
                     <!-- Input fields for each attribute -->
                     <div class="mb-3">
@@ -71,7 +71,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="phone" class="form-label">Phone</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="{{ service_professional.phone }}" required>
+                        <input type="tel" class="form-control" pattern="\d{10}" id="phone" name="phone" value="{{ service_professional.phone }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="city" class="form-label">City</label>
@@ -83,7 +83,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="experience" class="form-label">Experience</label>
-                        <input type="text" class="form-control" id="experience" name="experience" value="{{ service_professional.experience }}" required>
+                        <input type="number" class="form-control" id="experience" name="experience" value="{{ service_professional.experience }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="company_name" class="form-label">Company Name</label>
