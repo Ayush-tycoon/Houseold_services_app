@@ -160,7 +160,7 @@ def search_services():
     categories = ServiceCategory.query.filter_by(status='active').all()
 
     # Construct query filters
-    query_filters = [ServiceProfessional.status == 'approved']
+    query_filters = [ServiceProfessional.status == 'approved' and ServiceProfessional.service_category.in_([category.name for category in categories])]
     if query:
         query_filters.append(ServiceProfessional.name.like(f'%{query}%'))  # Case-insensitive match
     if city:

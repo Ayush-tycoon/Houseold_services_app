@@ -104,7 +104,7 @@
                             <form class='needs-validation' action="{{ url_for('editcustomer', id=user.id) }}" method="POST" novalidate>
                                 <div class="form-group mb-3">
                                     <label for="username" class="text-dark">Username</label>
-                                    <input type="text" class="form-control" id="username" name="username" value="{{user.username}}" required>
+                                    <input type="text" class="form-control" id="username" name="username" value="{{user.username}}" readonly>
                                     <div class="invalid-feedback">Username is required.</div>
                                 </div>
                 
@@ -226,7 +226,7 @@
                                 <div class="form-group mb-3">
                                     <label for="username" class="text-dark">Username</label>
                                     <input type="text" class="form-control" id="username" name="username"
-                                        value="{{user.username}}" required>
+                                        value="{{user.username}}" readonly>
                                     <div class="invalid-feedback">Username is required.</div>
                                 </div>
 
