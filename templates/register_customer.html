@@ -1,63 +1,98 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 mb-5 p-3">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <h2 class="text-center mb-4">Customer Registration</h2>
-            <form action="{{ url_for('registercustomer') }}" class="needs-validation" method="POST" novalidate>
+            <form action="{{ url_for('registercustomer') }}" 
+                  method="POST" 
+                  class="p-4 rounded shadow bg-dark text-light needs-validation" 
+                  novalidate>
+                
                 <div class="form-group mb-3">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="username" 
+                           name="username"
+                           required>
                     <div class="invalid-feedback">Username is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="name">Full Name</label>
-                    <input type="name" pattern="^[A-Za-z\s]+$" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
-                    <div class="invalid-feedback">Name is required. use only letters</div>
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="name" 
+                           pattern="^[A-Za-z\s]+$" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="name" 
+                           name="name"" 
+                           required>
+                    <div class="invalid-feedback">Name is required. Use only letters.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="email" 
+                           name="email"
+                           required>
                     <div class="invalid-feedback">Valid email is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="password" 
+                           name="password"
+                           required>
                     <div class="invalid-feedback">Password is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="cpassword">Confirm Password</label>
-                    <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Confirm password" required>
+                    <label for="cpassword" class="form-label">Confirm Password</label>
+                    <input type="password" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="cpassword" 
+                           name="cpassword"
+                           required>
                     <div class="invalid-feedback">Passwords must match.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="phone" 
+                           name="phone" 
+                           required>
                     <div class="invalid-feedback">Phone number is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="city">City</label>
-                    <input type="text" class="form-control" id="city" name="city" placeholder="Enter city" required>
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="city" 
+                           name="city"
+                           required>
                     <div class="invalid-feedback">City is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="address">Address</label>
-                    <textarea class="form-control" id="address" name="address" rows="3" placeholder="Enter your address" required></textarea>
+                    <label for="address" class="form-label">Address</label>
+                    <textarea class="form-control bg-black text-light border-dark" 
+                              id="address" 
+                              name="address" 
+                              rows="3"  
+                              required></textarea>
                     <div class="invalid-feedback">Address is required.</div>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block">Register</button>
             </form>
-
-            
         </div>
     </div>
 </div>

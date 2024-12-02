@@ -1,86 +1,147 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 mb-5 p-3">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h2 class="text-center mb-4">Service Professional Registration</h2>
-            <form action="{{ url_for('registerserviceprofessional') }}" class='needs-validation' method="POST" novalidate>
+            <form action="{{ url_for('registerserviceprofessional') }}" 
+                  method="POST" 
+                  class="p-4 rounded shadow bg-dark text-light needs-validation" 
+                  novalidate>
                 
                 <div class="form-group mb-3">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="username" 
+                           name="username" 
+                           placeholder="Enter username" 
+                           required>
                     <div class="invalid-feedback">Username is required.</div>
                 </div>
 
-
                 <div class="form-group mb-3">
-                    <label for="name">Full Name</label>
-                    <input type="text" pattern="^[A-Za-z\s]+$" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
-                    <div class="invalid-feedback">Name is required. Use letters only</div>
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" 
+                           pattern="^[A-Za-z\s]+$" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="name" 
+                           name="name" 
+                           placeholder="Enter your full name" 
+                           required>
+                    <div class="invalid-feedback">Name is required. Use letters only.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="email" 
+                           name="email" 
+                           placeholder="Enter email" 
+                           required>
                     <div class="invalid-feedback">Valid email is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="password" 
+                           name="password" 
+                           placeholder="Enter password" 
+                           required>
                     <div class="invalid-feedback">Password is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="cpassword">Confirm Password</label>
-                    <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Confirm password" required>
+                    <label for="cpassword" class="form-label">Confirm Password</label>
+                    <input type="password" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="cpassword" 
+                           name="cpassword" 
+                           placeholder="Confirm password" 
+                           required>
                     <div class="invalid-feedback">Passwords must match.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel"  pattern="\d{10}"  class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" 
+                           pattern="\d{10}" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="phone" 
+                           name="phone" 
+                           placeholder="Enter phone number" 
+                           required>
                     <div class="invalid-feedback">Valid 10 digit Phone number is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="city">City</label>
-                    <input type="text" class="form-control" id="city" name="city" placeholder="Enter city" required>
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="city" 
+                           name="city" 
+                           placeholder="Enter city" 
+                           required>
                     <div class="invalid-feedback">City is required.</div>
                 </div>
 
-                <select class="form-select mt-3" aria-label="Default select example" name="service_category" required>
+                <select class="form-select bg-black text-light border-dark mt-3" 
+                        aria-label="Default select example" 
+                        name="service_category" 
+                        required>
                     <option disabled selected>Service Category</option>
                     {% for category in service_categories %}
                     {% if category.status == 'active' %}
                     <option value="{{category.name}}">{{category.name}}</option>
                     {% endif %}
                     {% endfor %}
-                  </select>
+                </select>
 
                 <div class="form-group pb-3 pt-3">
-                    <label for="experience">Experience (in years)</label>
-                    <input type="number" class="form-control" id="experience" name="experience" placeholder="Enter experience in years" required>
+                    <label for="experience" class="form-label">Experience (in years)</label>
+                    <input type="number" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="experience" 
+                           name="experience" 
+                           placeholder="Enter experience in years" 
+                           required>
                     <div class="invalid-feedback">Experience is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="company_name">Company Name</label>
-                    <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Enter company name" required>
+                    <label for="company_name" class="form-label">Company Name</label>
+                    <input type="text" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="company_name" 
+                           name="company_name" 
+                           placeholder="Enter company name" 
+                           required>
                     <div class="invalid-feedback">Company name is required.</div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="price_per_hour">Price Per Hour (in Rs)</label>
-                    <input type="number" class="form-control" id="price_per_hour" name="price_per_hour" placeholder="Enter price per hour" required>
+                    <label for="price_per_hour" class="form-label">Price Per Hour (in Rs)</label>
+                    <input type="number" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="price_per_hour" 
+                           name="price_per_hour" 
+                           placeholder="Enter price per hour" 
+                           required>
                     <div class="invalid-feedback">Price per hour is required.</div>
-                    <p>Please enter prices above or matching the base prices. <a href="{{url_for('baseprice')}}" target="_blank">check the base prices</a> </p>
+                    <p>Please enter prices above or matching the base prices. <a href="{{url_for('baseprice')}}" target="_blank">check the base prices</a></p>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="expenses_per_hour">Expenses Per Hour (in Rs) -- Optional</label>
-                    <input type="number" class="form-control" id="expenses_per_hour" name="expenses_per_hour" placeholder="Enter expenses per hour">
+                    <label for="expenses_per_hour" class="form-label">Expenses Per Hour (in Rs) -- Optional</label>
+                    <input type="number" 
+                           class="form-control bg-black text-light border-dark" 
+                           id="expenses_per_hour" 
+                           name="expenses_per_hour" 
+                           placeholder="Enter expenses per hour">
                     <div class="invalid-feedback">Expenses per hour in rupees.</div>
                 </div>
 

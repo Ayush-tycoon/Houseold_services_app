@@ -1,21 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh; padding-top: 50px;">
     {% if session['role'] == 'admin' %}
         <div class="text-center">
-            <h3 class="h3">Admin Statistics</h3>
+            <h3 class="h3 mb-4" style="font-family: 'Arial', sans-serif; font-weight: bold; color: #333;">Admin Statistics</h3>
+            
             {% if plot_url %}
-                <img src="data:image/png;base64,{{ plot_url }}" alt="Statistics Plot" class="img-fluid" style="max-width: 100%;">
+                <div class="position-relative">
+                    <img src="data:image/png;base64,{{ plot_url }}" alt="Statistics Plot" class="img-fluid rounded shadow-lg" style="max-width: 100%; height: auto; transition: transform 0.3s ease-in-out;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div class="position-absolute top-50 start-50 translate-middle" style="font-size: 20px; color: rgba(0, 0, 0, 0.6);"></div>
+                </div>
             {% else %}
-                <p>No data available for the plot.</p>
+                <p class="text-muted mt-4" style="font-size: 18px; color: #555;">No data available for the plot.</p>
             {% endif %}
         </div>
     {% else %}
         <div class="text-center">
-            <h1>Access Denied</h1>
-            <p>You do not have permission to access this page</p>
-            <a href="{{ url_for('home') }}" class="btn btn-primary">Go back to home</a>
+            <h1 class="text-danger mb-4" style="font-family: 'Arial', sans-serif; font-weight: bold;">Access Denied</h1>
+            <p class="text-muted" style="font-size: 18px; color: #555;">You do not have permission to access this page</p>
+            <a href="{{ url_for('home') }}" class="btn btn-primary mt-3" style="border-radius: 50px; padding: 10px 30px; font-size: 16px; text-transform: uppercase;">Go back to home</a>
         </div>
     {% endif %}
 </div>

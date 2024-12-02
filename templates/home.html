@@ -1,9 +1,16 @@
-{%extends "base.html"%}
+{% extends "base.html" %}
 
-
-{%block content%}
-<div class="container text-center mt-5 pt-5 ">
-    <h1>Home</h1>
-    <p>Welcome to the home page</p>
+{% block content %}
+<div class="container text-center mt-1 pt-2">
+    <h1>Urban Ease</h1>
+    <p class="pb-2">Solutions to all your Urban worries</p>
 </div>
-{%endblock%}
+
+<div class="container text-center pb-5">
+    <!-- Rectangle Image with modern effects -->
+    <img src="{{ url_for('static', filename='images/img-1.jpg') }}" 
+         alt="Urban Solutions" 
+         class="img-fluid shadow-lg rounded mx-auto d-block" 
+         style="max-width: 60%;">
+</div>
+{% endblock %}

@@ -919,7 +919,7 @@ def logout():
     session.pop('name', None)
     session.pop('user_id', None)
     logout_user()
-    return redirect(url_for('Login'))
+    return redirect(url_for('home'))
 
 
 @app.route('/admin_summary')
@@ -1131,23 +1131,22 @@ def editcustomer(id):
         return redirect(url_for('manageusers'))
 
     if request.method == 'POST':
-        # Get form data
-        username = request.form.get('username')
+        username = User.query.get(id).username
         name = request.form.get('name')
         email = request.form.get('email')
         phone = request.form.get('phone')
         city = request.form.get('city')
         address = request.form.get('address')
         
-        use = User.query.filter_by(username=username).first()
-        if use and session['role']=='customer':
-            flash('Username already exists')
-            Customer_id = session.get('user_id')
-            customer = Customer.query.filter_by(user_id=Customer_id).first()
-            return render_template('customer_profile.html', customer=customer)
-        elif use and session['role']=='admin':
-            flash('Username already exists')
-            return redirect(url_for('manageusers', id=id))
+        # use = User.query.filter_by(username=username).first()
+        # if use and session['role']=='customer':
+        #     flash('Username already exists')
+        #     Customer_id = session.get('user_id')
+        #     customer = Customer.query.filter_by(user_id=Customer_id).first()
+        #     return render_template('customer_profile.html', customer=customer)
+        # elif use and session['role']=='admin':
+        #     flash('Username already exists')
+        #     return redirect(url_for('manageusers', id=id))
 
         # Validation
         errors = []

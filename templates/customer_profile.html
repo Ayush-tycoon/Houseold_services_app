@@ -4,12 +4,12 @@
 
 <div class="row mt-4 justify-content-center">
     <div class="col-md-8 col-lg-6">
-        <!-- Profile Card -->
-        <div class="card shadow-sm">
-            <div class="card-header text-center">
+        <!-- Profile Card with Transparent Background and Dark Theme -->
+        <div class="card shadow-lg rounded-3" style="background-color: rgba(0, 0, 0, 0.8); border: none;">
+            <div class="card-header text-center bg-dark text-white">
                 <h4>Your Profile</h4>
             </div>
-            <div class="card-body">
+            <div class="card-body text-white">
                 <div class="row">
                     <div class="col-12 mb-3">
                         <p><strong>Name:</strong> {{ customer.name }}</p>
@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <!-- Edit Button -->
-                <button type="button" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#editCustomerModal">
+                <button type="button" class="btn btn-warning w-100 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#editCustomerModal">
                     Edit Details
                 </button>
             </div>
@@ -45,47 +45,51 @@
 <!-- Modal for Editing Customer Details -->
 <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content shadow-lg rounded-3" style="background-color: rgba(0, 0, 0, 0.9);">
+            <div class="modal-header bg-dark text-white">
                 <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" class='needs-validation' action="{{ url_for('editcustomer', id=customer.user_id) }}" novalidate>
-                <div class="modal-body">
+                <div class="modal-body text-white">
+                    <!-- Username -->
                     <div class="form-group mb-3">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" value="{{customer.user.username}}" required>
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ customer.user.username }}" readonly>
                         <div class="invalid-feedback">Username is required.</div>
                     </div>
+
                     <!-- Name -->
                     <div class="form-group mb-3">
-                        <label for="name">Name</label>
+                        <label for="name" class="form-label">Name</label>
                         <input type="text" class="form-control" id="name" name="name" value="{{ customer.name }}" required>
                         <div class="invalid-feedback">Name is required</div>
                     </div>
 
                     <!-- Phone -->
                     <div class="form-group mb-3">
-                        <label for="phone">Phone</label>
-                        <input type="tel" pattern="\d{10}" 
-                        maxlength="10" class="form-control" id="phone" name="phone" value="{{ customer.phone }}" required>
-                        <div class="invalid-feedback">10 digit Phone is required</div>
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="tel" pattern="\d{10}" maxlength="10" class="form-control" id="phone" name="phone" value="{{ customer.phone }}" required>
+                        <div class="invalid-feedback">10-digit Phone is required</div>
                     </div>
+
+                    <!-- Email -->
                     <div class="form-group mb-3">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{customer.user.email}}" required>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ customer.user.email }}" required>
                         <div class="invalid-feedback">Valid email is required.</div>
                     </div>
+
                     <!-- City -->
                     <div class="form-group mb-3">
-                        <label for="city">City</label>
+                        <label for="city" class="form-label">City</label>
                         <input type="text" class="form-control" id="city" name="city" value="{{ customer.city }}" required>
                         <div class="invalid-feedback">City is required</div>
                     </div>
 
                     <!-- Address -->
                     <div class="form-group mb-3">
-                        <label for="address">Address</label>
+                        <label for="address" class="form-label">Address</label>
                         <textarea class="form-control" id="address" name="address" rows="3" required>{{ customer.address }}</textarea>
                         <div class="invalid-feedback">Address is required</div>
                     </div>
@@ -100,4 +104,3 @@
 </div>
 
 {% endblock %}
-    

@@ -14,3 +14,51 @@ body {
     font-weight: 450;
     font-style: normal;
 }
+
+.custom-bg {
+  background: linear-gradient(45deg, #6fe2e1, #5258e5) !important;
+  min-height: 100vh; /* Minimum height is 100% of the viewport height */
+  display: flex;
+  flex-direction: column;
+}
+
+.container-cust {
+  flex-grow: 1; 
+}
+
+.custom-bg2 {
+  background: linear-gradient(45deg, #5258e5, #6fe2e1) !important;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #ffffff !important; /* Example color on hover */
+}
+
+/* Style for active nav link */
+.navbar-nav .nav-link.active {
+  color: #ffffff !important; /* Color for active page link */
+}
+
+.scale-on-hover {
+  transition: transform 0.3s ease;
+}
+
+.scale-on-hover:hover {
+  transform: scale(1.05);
+}
+
+.navbar-expand-hover {
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar-expand-hover:hover {
+  transform: scale(1.01); /* Slightly increases the size of the navbar */
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05); /* Adds a subtle shadow for effect */
+}
+
+.container-cust2 {
+background-color: rgba(255, 255, 255, 0.2); 
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}

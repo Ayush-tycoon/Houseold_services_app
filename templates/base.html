@@ -11,21 +11,25 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container-fluid mt-3">
+  <div class="container-cust custom-bg">
+    <div class="container pt-3 pb-3">
             {%include 'navbar.html'%}
         </div>
-        <div class="container mt-5">
+        <div class="container mt-2">
       {% with messages = get_flashed_messages() %}
       {% if messages %}
           <div class="alert alert-light mt-4" role="alert">
               {{ messages[0] }}
           </div>
+          </div>
+
       {% endif %}
   {% endwith %}
     
     {%block content%} 
     
     {%endblock%}
+  </div>
 </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
